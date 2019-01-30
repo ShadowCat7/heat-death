@@ -5,32 +5,51 @@ import {
     isEntitiesColliding,
     isRectsColliding,
     rectEntityDistance,
-    snapToGrid,
 } from '../physics.js';
 
-import { INTERACT_RADIUS } from '../constants.js';
+import { INTERACT_RADIUS, VIEW_WIDTH } from '../constants.js';
 import item from '../entity/item.js';
 import stump from '../entity/stump.js';
 import createTimer from '../timer.js';
 import { drawRect } from '../draw-utility.js';
 
 const MAX_SPEED = 300;
+const ATTACK_TIME_LIMIT = 0.3;
+const attackTimer = createTimer(ATTACK_TIME_LIMIT);
+const SWORD_WIDTH = 10;
+const SWORD_LENGTH = 30;
 
 const getSwordPosition = (player, direction) => {
     let swordX = player.x;
     let swordY = player.y;
 
+    const movingPosition = (player.rect.width + SWORD_WIDTH) * (attackTimer.getTime() / ATTACK_TIME_LIMIT);
+
+    let width;
+    let height;
     if (direction === 'up') {
         swordY -= player.rect.height;
+        swordX = player.x - SWORD_WIDTH + movingPosition;
+        width = SWORD_WIDTH;
+        height = SWORD_LENGTH;
     } else if (direction === 'down') {
         swordY += player.rect.height;
+        swordX = player.x + player.rect.width - movingPosition;
+        width = SWORD_WIDTH;
+        height = SWORD_LENGTH;
     } else if (direction === 'left') {
         swordX -= player.rect.width;
+        swordY = player.y + player.rect.height - movingPosition;
+        width = SWORD_LENGTH;
+        height = SWORD_WIDTH;
     } else if (direction === 'right') {
         swordX += player.rect.width;
+        swordY = player.y - SWORD_WIDTH + movingPosition;
+        width = SWORD_LENGTH;
+        height = SWORD_WIDTH;
     }
 
-    return { swordX, swordY };
+    return { swordX, swordY, width, height };
 };
 
 export default {
@@ -61,7 +80,6 @@ export default {
 
         let direction = null;
         let attacking = false;
-        const attackTimer = createTimer(1);
 
         options.update = (player, controls, entityList, elapsedTime) => {
             let newX = player.x;
@@ -92,7 +110,7 @@ export default {
                 }
             }
 
-            if (!attacking && controls.attack) {
+            if (!attacking && controls.attack && !controls.previousControls.attack) {
                 attacking = true;
             }
 
@@ -114,9 +132,9 @@ export default {
                 const { x, y, didCollide } = isEntitiesColliding(player, newX, newY, entity);
 
                 if (entity.type === 'monster' && attacking) {
-                    let { swordX, swordY } = getSwordPosition(player, direction);
+                    let { swordX, swordY, height, width } = getSwordPosition(player, direction);
 
-                    if (isRectsColliding(player.rect, swordX, swordY, entity.rect, entity.x, entity.y)) {
+                    if (isRectsColliding({ width, height }, swordX, swordY, entity.rect, entity.x, entity.y)) {
                         entityList[i] = item.create({
                             causesCollisions: false,
                             width: entity.rect.width,
@@ -205,10 +223,26 @@ export default {
         player.draw = (ctx, viewX, viewY) => {
             defaultDraw(ctx, viewX, viewY);
 
-            if (attacking) {
-                let { swordX, swordY } = getSwordPosition(player, direction);
+            ctx.fillStyle = '#909090';
+            ctx.fillRect(0, 0, VIEW_WIDTH, 21);
 
-                drawRect(ctx, player.rect, swordX - viewX, swordY - viewY, '#55aacc');
+            ctx.fillStyle = 'green';
+            ctx.fillRect(3, 3, player.health / 1000 * (VIEW_WIDTH - 6), 15);
+
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#eee';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
+
+            if (attacking) {
+                let { swordX, swordY, width, height, angle, translate } = getSwordPosition(player, direction);
+
+                drawRect(ctx, {
+                    width,
+                    height,
+                }, swordX - viewX, swordY - viewY, '#55aacc');
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
             }
         };
 

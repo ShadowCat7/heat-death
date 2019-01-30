@@ -14,5 +14,8 @@ export default (timeLimit) => {
             return false;
         },
         changeTimeLimit: (newLimit) => { limit = newLimit; },
+        getTime: () => {
+            return time;
+        },
     };
 };

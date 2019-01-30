@@ -25,7 +25,7 @@ export default {
             const y = entity.y - viewY;
 
             if (entity.inInteractRange) {
-                ctx.font = '30px Arial';
+                ctx.font = '22px Arial';
                 ctx.fillStyle = '#eee';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';

@@ -38,6 +38,14 @@ export default {
                 width: entity.rect.width * 3,
                 height: entity.rect.height * 2,
             }, x - entity.rect.width, y - entity.rect.height * 3, isPlayerBehindTree ? '#33996699' : '#339966');
+
+            if (entity.inInteractRange) {
+                ctx.font = '22px Arial';
+                ctx.fillStyle = '#eee';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('Cut down tree', x + entity.rect.width / 2, y);
+            }
         };
 
         return entityFactory.create(options);

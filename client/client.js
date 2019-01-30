@@ -7,7 +7,7 @@ import tree from './entity/tree.js';
 import { snapToGrid } from './physics.js';
 import { GRID_SIZE } from './constants.js';
 import monster from './entity/monsters/monster.js';
-import { moveRandom, standStill } from './entity/monsters/behaviors.js';
+import { chasePlayer, chasePlayerIfClose, moveRandom, standStill } from './entity/monsters/behaviors.js';
 import createMenu from './menu.js';
 
 import loadImages from './image-loader.js';
@@ -151,15 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         player = playerFactory.create({
-            x: 120,
-            y: 120,
+            x: -120,
+            y: -120,
         });
         entityList.push(player);
 
         entityList.push(monster.create({
             x: -40,
             y: -40,
-            behavior: standStill,
+            behavior: chasePlayerIfClose,
         }));
 
         entityList.push(block.create({

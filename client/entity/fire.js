@@ -37,24 +37,12 @@ export default {
             const y = entity.y - viewY;
 
             if (entity.inInteractRange) {
-                ctx.font = '30px Arial';
+                ctx.font = '22px Arial';
                 ctx.fillStyle = '#eee';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
-                ctx.fillText('Add wood', x + entity.rect.width / 2, y);
+                ctx.fillText('Fuel the fire', x + entity.rect.width / 2, y);
             }
-
-            ctx.fillStyle = '#909090';
-            ctx.fillRect(0, 0, VIEW_WIDTH, 21);
-
-            ctx.fillStyle = 'green';
-            ctx.fillRect(3, 3, player.health / 1000 * (VIEW_WIDTH - 6), 15);
-
-            ctx.font = '12px Arial';
-            ctx.fillStyle = '#eee';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
         };
 
         return entity;

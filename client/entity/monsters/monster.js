@@ -16,8 +16,8 @@ export default {
 
         options.color = 'yellow';
 
-        options.update = (monster, controls, entityList, elapsedTime) => {
-            let { newX, newY } = monster.behavior(elapsedTime);
+        options.update = (monster, controls, entityList, elapsedTime, player) => {
+            let { newX, newY } = monster.behavior(elapsedTime, player);
 
             for (let i = 0; i < entityList.length; i++) {
                 const entity = entityList[i];

@@ -13,6 +13,10 @@ export const rectDistance = (rect1, x1, y1, rect2, x2, y2) => {
     );
 };
 
+export const getDirection = (x1, y1, x2, y2) => {
+    return Math.atan2(y2 - y1, x2 - x1);
+};
+
 export const rectEntityDistance = (entity1, entity2) => {
     return rectDistance(entity1.rect, entity1.x, entity1.y, entity2.rect, entity2.x, entity2.y);
 };
