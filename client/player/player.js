@@ -236,7 +236,7 @@ export default {
             ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
 
             if (attacking) {
-                let { swordX, swordY, width, height, angle, translate } = getSwordPosition(player, direction);
+                let { swordX, swordY, width, height } = getSwordPosition(player, direction);
 
                 drawRect(ctx, {
                     width,
@@ -249,12 +249,13 @@ export default {
         player.addItemToFire = (itemType) => {
             const itemCount = player.inventory[itemType];
 
-            player.inventory[itemType] = 0;
-
             switch (itemType) {
-                case 'wood': player.health += 10 * itemCount;
-                case 'corpse': player.health += 1 * itemCount;
+                case 'wood': player.health += 10 * itemCount; break;
+                case 'corpse': player.health += 1 * itemCount; break;
+                default: return;
             }
+
+            player.inventory[itemType] = 0;
         };
 
         return player;

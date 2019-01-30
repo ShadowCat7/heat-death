@@ -12,6 +12,7 @@ import createMenu from './menu.js';
 
 import loadImages from './image-loader.js';
 import spriteData from './sprite.js';
+import { controlsToString, getControls } from './controls.js';
 
 let canvas = null;
 let fpsLabel = null;
@@ -19,6 +20,9 @@ let engine = null;
 let previousControls = {};
 let spriteSheet = null;
 let sprites = null;
+let showDevInfo = false;
+let devDiv = null;
+let controlPanel = null;
 
 let player = null;
 const entityList = [];
@@ -59,50 +63,14 @@ function draw() {
 }
 
 function update(buttonsPressed, elapsedTime) {
-    controls = {};
-
-    // w
-    if (buttonsPressed[87]) {
-        controls.moveUp = true;
-    }
-    // s
-    if (buttonsPressed[83]) {
-        controls.moveDown = true;
-    }
-    // a
-    if (buttonsPressed[65]) {
-        controls.moveLeft = true;
-    }
-    // d
-    if (buttonsPressed[68]) {
-        controls.moveRight = true;
-    }
-    // shift
-    if (buttonsPressed[16]) {
-        controls.shift = true;
-    }
-    // e
-    if (buttonsPressed[69]) {
-        controls.interact = true;
-    }
-    // i
-    if (buttonsPressed[73]) {
-        controls.inventory = true;
-    }
-    // m
-    if (buttonsPressed[77]) {
-        controls.map = true;
-    }
-    // spacebar
-    if (buttonsPressed[32]) {
-        controls.attack = true;
-    }
-    // escape
-    if (buttonsPressed[27]) {
-        controls.escape = true;
-    }
+    controls = getControls(buttonsPressed);
 
     controls.previousControls = previousControls;
+
+    if (controls.showDevInfo && !controls.previousControls.showDevInfo) {
+        showDevInfo = !showDevInfo;
+        devDiv.hidden = showDevInfo;
+    }
 
     if (!controls.inventory && !controls.map && !player.addItemMenu) {
         for (let i = 0; i < entityList.length; i++) {
@@ -136,6 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
     fpsLabel = document.getElementById('fps');
     spriteSheet = document.getElementById('sprite');
     spriteSheet.src = spriteData.sprite;
+    devDiv = document.getElementById('dev');
+    devDiv.hidden = showDevInfo;
+    controlPanel = document.getElementById('controls');
+    controlPanel.innerHTML = controlsToString();
 
     engine = engineFactory.create(canvas, update, draw);
 

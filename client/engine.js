@@ -10,7 +10,7 @@ function Engine(canvas, updateFunc, drawFunc) {
     var self = this;
     var animationFrameId = null;
     var timeoutId = null;
-    var buttonsPressed = new Array(222);
+    const buttonsPressed = {};
     var keysPressedLabel = document.getElementById('keypressed');
 
     self.fps = TARGET_FPS;
@@ -66,20 +66,18 @@ function Engine(canvas, updateFunc, drawFunc) {
 
     document.addEventListener('keydown', function (e) {
         e.stopPropagation();
-        keysPressedLabel.innerHTML = Math.round(e.keyCode);
-        //console.log(e.keyCode);
-        buttonsPressed[e.keyCode] = true;
+        keysPressedLabel.innerHTML = (e.code);
+        buttonsPressed[e.code] = true;
     });
 
     document.addEventListener('keyup', function (e) {
         e.stopPropagation();
-        buttonsPressed[e.keyCode] = false;
+        buttonsPressed[e.code] = false;
     });
 }
 
 export default {
     create: function (canvas, updateFunc, drawFunc) {
-        canvas = canvas;
         return new Engine(canvas, updateFunc, drawFunc);
     }
 };
