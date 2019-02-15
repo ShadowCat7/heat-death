@@ -9,12 +9,27 @@ const controlMap = {
     'Space': 'attack',
     'Escape': 'escape',
     'KeyV': 'showDevInfo',
+    'KeyP': 'save',
+};
+
+const friendlyKeyMap = {
+    'KeyW': 'W',
+    'KeyS': 'S',
+    'KeyA': 'A',
+    'KeyD': 'D',
+    'KeyE': 'E',
+    'KeyI': 'I',
+    'KeyM': 'M',
+    'Space': 'Spacebar',
+    'Escape': 'Escape',
+    'KeyV': 'V',
+    'KeyP': 'P',
 };
 
 export const controlsToString = () => {
     let controls = '';
     for (let control in controlMap) {
-        controls += `<p>${control}: ${controlMap[control]},</p>`;
+        controls += `<p>${friendlyKeyMap[control]}: ${controlMap[control]},</p>`;
     }
     return controls;
 };

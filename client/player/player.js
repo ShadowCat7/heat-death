@@ -59,23 +59,7 @@ export default {
 
         options.type = 'player';
 
-        options.inventory = {
-            thing: 120,
-            a: 1,
-            b: 1,
-            c: 1,
-            d: 1,
-            e: 1,
-            f: 1,
-            g: 1,
-            h: 1,
-            i: 1,
-            j: 1,
-            k: 1,
-            l: 1,
-            m: 1,
-        };
-
+        options.inventory = {};
         options.health = 100;
 
         let direction = null;
@@ -222,18 +206,6 @@ export default {
         const defaultDraw = defaultDrawFunc(player);
         player.draw = (ctx, viewX, viewY) => {
             defaultDraw(ctx, viewX, viewY);
-
-            ctx.fillStyle = '#909090';
-            ctx.fillRect(0, 0, VIEW_WIDTH, 21);
-
-            ctx.fillStyle = 'green';
-            ctx.fillRect(3, 3, player.health / 1000 * (VIEW_WIDTH - 6), 15);
-
-            ctx.font = '12px Arial';
-            ctx.fillStyle = '#eee';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
 
             if (attacking) {
                 let { swordX, swordY, width, height } = getSwordPosition(player, direction);

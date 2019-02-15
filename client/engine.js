@@ -37,7 +37,6 @@ function Engine(canvas, updateFunc, drawFunc) {
 
         function draw() {
             let currentTime = new Date().getTime();
-            let timeSinceLastUpdate = (currentTime - previousUpdate) / 1000;
             let timeSinceLastDraw = (currentTime - previousDraw) / 1000;
             let fps = 1 / timeSinceLastDraw;
             previousDraw = currentTime;
@@ -45,7 +44,7 @@ function Engine(canvas, updateFunc, drawFunc) {
             self.fps = self.fps * FPS_SMOOTHNESS + fps * FPS_ONE_FRAME_WEIGHT;
 
             setTimeout(function () {
-                drawFunc(timeSinceLastUpdate);
+                drawFunc();
             }, 0);
 
             timeoutId = setTimeout(update, 0);
@@ -63,13 +62,13 @@ function Engine(canvas, updateFunc, drawFunc) {
         clearTimeout(timeoutId);
     };
 
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', (e) => {
         e.stopPropagation();
         keysPressedLabel.innerHTML = (e.code);
         buttonsPressed[e.code] = true;
     });
 
-    document.addEventListener('keyup', function (e) {
+    document.addEventListener('keyup', (e) => {
         e.stopPropagation();
         buttonsPressed[e.code] = false;
     });

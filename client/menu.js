@@ -16,6 +16,7 @@ export default ({
 }) => {
     let cursorPosition = 0;
     let cursorShown = false;
+    let isActionsOpen = false;
 
     return {
         changeItems: (newItems) => {
@@ -75,7 +76,12 @@ export default ({
                 }
 
                 if (controls.interact && !controls.previousControls.interact) {
-                    chooseCallback(items[cursorPosition].id);
+                    const item = items[cursorPosition];
+                    //if (item.actions) {
+                    //    isActionsOpen = true;
+                    //} else {
+                        chooseCallback(items[cursorPosition].id);
+                    //}
                 }
 
                 cursorPosition = Math.max(cursorPosition, 0);

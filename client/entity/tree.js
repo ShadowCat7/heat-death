@@ -19,7 +19,8 @@ export default {
             const x = entity.x - viewX;
             const y = entity.y - viewY;
 
-            const isPlayerBehindTree = isRectsColliding(
+            // if there is no player fade the tree anyway (map making)
+            const isPlayerBehindTree = !player || isRectsColliding(
                 player.rect,
                 player.x,
                 player.y,

@@ -17,3 +17,11 @@ canvas {
 #sprite {
     background-color: gray;
 }
+
+#dev {
+    padding: 10px;
+}
+
+#save {
+    padding: 10px;
+}

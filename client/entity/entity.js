@@ -3,8 +3,6 @@ import { drawRect } from '../draw-utility.js';
 export const defaultDrawFunc = (entity) => {
     return (ctx, viewX, viewY, player) => {
         if (entity.rect) {
-            let path = new Path2D();
-
             const x = entity.x - viewX;
             const y = entity.y - viewY;
 

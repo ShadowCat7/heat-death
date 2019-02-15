@@ -1,47 +1,30 @@
-import engineFactory from './engine.js';
 import playerFactory from './player/player.js';
-import block from './entity/block.js';
-import item from './entity/item.js';
-import fire from './entity/fire.js';
-import tree from './entity/tree.js';
 import { snapToGrid } from './physics.js';
-import { GRID_SIZE } from './constants.js';
+import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH } from './constants.js';
 import monster from './entity/monsters/monster.js';
 import { chasePlayer, chasePlayerIfClose, moveRandom, standStill } from './entity/monsters/behaviors.js';
 import createMenu from './menu.js';
+import load from './load.js';
+import level0 from './levels/level0.js';
 
-import loadImages from './image-loader.js';
-import spriteData from './sprite.js';
-import { controlsToString, getControls } from './controls.js';
+import { loadGame, startGame } from './game.js';
 
-let canvas = null;
-let fpsLabel = null;
-let engine = null;
-let previousControls = {};
-let spriteSheet = null;
 let sprites = null;
-let showDevInfo = false;
-let devDiv = null;
-let controlPanel = null;
 
 let player = null;
-const entityList = [];
+let entityList = [];
 
-let controls = {};
+let currentControls = {};
 
 let inventoryMenu = null;
+let isInventoryOpen = false;
 
-function draw() {
-    let ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    fpsLabel.innerHTML = Math.round(engine.fps);
-
-    if (controls.inventory) {
+function draw(ctx) {
+    if (currentControls.inventory) {
         inventoryMenu.draw(ctx, player);
     } else if (player.addItemMenu) {
         inventoryMenu.draw(ctx, player);
-    } else if (controls.map) {
+    } else if (currentControls.map) {
         const MAP_GRID_SIZE = 4;
         const gridView = snapToGrid(player.x, player.y);
         gridView.x = gridView.x / GRID_SIZE * MAP_GRID_SIZE - 400;
@@ -56,27 +39,42 @@ function draw() {
             ctx.fillRect(x, y, MAP_GRID_SIZE, MAP_GRID_SIZE);
         }
     } else {
+        let viewX = player.x - VIEW_WIDTH / 2 + player.rect.width / 2;
+        let viewY = player.y - VIEW_HEIGHT / 2 + player.rect.height / 2;
+
         for (let i = 0; i < entityList.length; i++) {
-            entityList[i].draw(ctx, player.x - 400 + 15, player.y - 300 + 15, player);
+            entityList[i].draw(ctx, viewX, viewY, player);
         }
+
+        // player health bar
+        ctx.fillStyle = '#909090';
+        ctx.fillRect(0, 0, VIEW_WIDTH, 21);
+
+        ctx.fillStyle = 'green';
+        ctx.fillRect(3, 3, player.health / 1000 * (VIEW_WIDTH - 6), 15);
+
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#eee';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
     }
 }
 
-function update(buttonsPressed, elapsedTime) {
-    controls = getControls(buttonsPressed);
+function update(controls, elapsedTime) {
+    currentControls = controls;
 
-    controls.previousControls = previousControls;
-
-    if (controls.showDevInfo && !controls.previousControls.showDevInfo) {
-        showDevInfo = !showDevInfo;
-        devDiv.hidden = showDevInfo;
+    if (controls.inventory && !controls.previousControls.inventory) {
+        isInventoryOpen = !isInventoryOpen;
+    } else {
+        isInventoryOpen = player.addItemMenu;
     }
 
-    if (!controls.inventory && !controls.map && !player.addItemMenu) {
+    if (!isInventoryOpen && !controls.map) {
         for (let i = 0; i < entityList.length; i++) {
             entityList[i].update(controls, entityList, elapsedTime, player);
         }
-    } else if (player.addItemMenu || controls.inventory) {
+    } else if (isInventoryOpen) {
         const inventory = [];
 
         for (let itemType in player.inventory) {
@@ -85,108 +83,38 @@ function update(buttonsPressed, elapsedTime) {
             inventory.push({
                 label: `${itemType}: ${itemCount}`,
                 id: itemType,
+                //actions: [
+                //    'use',
+                //    'drop',
+                //],
             });
         }
 
         inventoryMenu.changeItems(inventory);
 
-        inventoryMenu.update(player.addItemMenu, controls, (itemType) => {
+        inventoryMenu.update(true, controls, (itemType) => {
             player.addItemToFire(itemType);
             player.addItemMenu = false;
         });
     }
-
-    previousControls = controls;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    canvas = document.getElementById('game');
-    fpsLabel = document.getElementById('fps');
-    spriteSheet = document.getElementById('sprite');
-    spriteSheet.src = spriteData.sprite;
-    devDiv = document.getElementById('dev');
-    devDiv.hidden = showDevInfo;
-    controlPanel = document.getElementById('controls');
-    controlPanel.innerHTML = controlsToString();
+loadGame((images) => {
+    sprites = images;
 
-    engine = engineFactory.create(canvas, update, draw);
-
-    new Promise(loadImages).then((images) => {
-        sprites = images;
-
-        engine.start();
-
-        inventoryMenu = createMenu({
-            items: [],
-            title: 'Inventory',
-            cursorImage: sprites['arrow'],
-        });
-
-        player = playerFactory.create({
-            x: -120,
-            y: -120,
-        });
-        entityList.push(player);
-
-        entityList.push(monster.create({
-            x: -40,
-            y: -40,
-            behavior: chasePlayerIfClose,
-        }));
-
-        entityList.push(block.create({
-            x: 40,
-            y: 40,
-        }));
-
-        entityList.push(block.create({
-            x: 80,
-            y: 40,
-        }));
-
-        entityList.push(block.create({
-            x: 40,
-            y: 120,
-        }));
-        entityList.push(block.create({
-            x: 80,
-            y: 120,
-        }));
-
-        entityList.push(block.create({
-            x: 400,
-            y: 400,
-        }));
-
-        entityList.push(block.create({
-            x: 400,
-            y: 440,
-        }));
-
-        entityList.push(block.create({
-            x: 480,
-            y: 400,
-        }));
-
-        entityList.push(block.create({
-            x: 480,
-            y: 440,
-        }));
-
-        entityList.push(item.create({
-            x: 360,
-            y: 360,
-            itemType: 'wood',
-        }));
-
-        entityList.push(fire.create({
-            x: 400,
-            y: 40,
-        }));
-
-        entityList.push(tree.create({
-            x: 520,
-            y: 40,
-        }));
+    inventoryMenu = createMenu({
+        items: [],
+        title: 'Inventory',
+        cursorImage: sprites['arrow'],
     });
+
+    player = playerFactory.create({
+        x: 0,
+        y: 0,
+    });
+    entityList.push(player);
+
+    entityList = entityList.concat(load(level0));
+
+    startGame(update, draw);
 });
