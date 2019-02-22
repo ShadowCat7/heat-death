@@ -20,9 +20,7 @@ let inventoryMenu = null;
 let isInventoryOpen = false;
 
 function draw(ctx) {
-    if (currentControls.inventory) {
-        inventoryMenu.draw(ctx, player);
-    } else if (player.addItemMenu) {
+    if (isInventoryOpen) {
         inventoryMenu.draw(ctx, player);
     } else if (currentControls.map) {
         const MAP_GRID_SIZE = 4;
@@ -66,8 +64,10 @@ function update(controls, elapsedTime) {
 
     if (controls.inventory && !controls.previousControls.inventory) {
         isInventoryOpen = !isInventoryOpen;
-    } else {
-        isInventoryOpen = player.addItemMenu;
+    }
+
+    if (player.addItemMenu) {
+        isInventoryOpen = true;
     }
 
     if (!isInventoryOpen && !controls.map) {
@@ -83,18 +83,26 @@ function update(controls, elapsedTime) {
             inventory.push({
                 label: `${itemType}: ${itemCount}`,
                 id: itemType,
-                //actions: [
-                //    'use',
-                //    'drop',
-                //],
+                disabled: itemCount === 0,
+                actions: [
+                    'use',
+                    'drop',
+                ],
             });
         }
 
         inventoryMenu.changeItems(inventory);
 
-        inventoryMenu.update(true, controls, (itemType) => {
-            player.addItemToFire(itemType);
+        inventoryMenu.update(true, controls, (itemType, action) => {
+            isInventoryOpen = false;
             player.addItemMenu = false;
+
+            if (!itemType) return;
+
+            const droppedItem = player.useItem(itemType, action);
+            if (droppedItem) {
+                entityList.push(droppedItem);
+            }
         });
     }
 }

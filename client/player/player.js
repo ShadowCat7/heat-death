@@ -7,7 +7,7 @@ import {
     rectEntityDistance,
 } from '../physics.js';
 
-import { INTERACT_RADIUS, VIEW_WIDTH } from '../constants.js';
+import { GRID_SIZE, INTERACT_RADIUS, VIEW_WIDTH } from '../constants.js';
 import item from '../entity/item.js';
 import stump from '../entity/stump.js';
 import createTimer from '../timer.js';
@@ -64,6 +64,7 @@ export default {
 
         let direction = null;
         let attacking = false;
+        let interactWith = null;
 
         options.update = (player, controls, entityList, elapsedTime) => {
             let newX = player.x;
@@ -172,12 +173,13 @@ export default {
 
                         entityList.splice(closestItemIndex, 1);
                         if (!player.inventory[itemType]) {
-                            player.inventory[itemType] = 1;
+                            player.inventory[itemType] = entity.count;
                         } else {
                             player.inventory[itemType]++;
                         }
                     } else if (entity.type === 'fire') {
                         player.addItemMenu = true;
+                        interactWith = 'fire';
                     } else if (entity.type === 'tree') {
                         if (!player.inventory.wood) {
                             player.inventory.wood = 10;
@@ -218,16 +220,45 @@ export default {
             }
         };
 
-        player.addItemToFire = (itemType) => {
+        player.useItem = (itemType, action) => {
             const itemCount = player.inventory[itemType];
 
-            switch (itemType) {
-                case 'wood': player.health += 10 * itemCount; break;
-                case 'corpse': player.health += 1 * itemCount; break;
-                default: return;
-            }
+            if (action === 'drop') {
+                const droppedItem = item.create({
+                    causesCollisions: false,
+                    width: GRID_SIZE,
+                    height: GRID_SIZE,
+                    x: player.x,
+                    y: player.y,
+                    itemType,
+                    count: itemCount,
+                });
 
-            player.inventory[itemType] = 0;
+                player.inventory[itemType] = 0;
+
+                return droppedItem;
+            } else {
+                let loseItems = false;
+
+                switch (itemType) {
+                    case 'wood':
+                        if (interactWith === 'fire') {
+                            player.health += 10 * itemCount;
+                            loseItems = true;
+                        }
+                        break;
+                    case 'corpse':
+                        player.health += 1 * itemCount;
+                        break;
+                    default:
+                        console.error('that item type isn\'t handled');
+                        return;
+                }
+
+                if (loseItems) {
+                    player.inventory[itemType] = 0;
+                }
+            }
         };
 
         return player;

@@ -6,6 +6,7 @@ export default {
         options.height = options.width || 40;
         options.causesCollisions = options.causesCollisions !== undefined ? options.causesCollisions : true;
         options.type = 'item';
+        options.count = options.count || 1;
 
         options.interactive = true;
 

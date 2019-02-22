@@ -20,7 +20,6 @@ let providedDraw = null;
 function draw() {
     let ctx = canvas.getContext('2d');
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    //ctx.scale(2,2);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     fpsLabel.innerHTML = Math.round(engine.fps);
 
@@ -65,11 +64,6 @@ export const loadGame = (callback) => {
         canvas.oncontextmenu = () => {
             return false;
         };
-
-        //canvas.width = 1600;
-        //canvas.height = 1200;
-        //canvas.style.width = "800px";
-        //canvas.style.height = "600px";
 
         fpsLabel = document.getElementById('fps');
         spriteSheet = document.getElementById('sprite');
