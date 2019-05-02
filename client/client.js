@@ -4,6 +4,7 @@ import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH } from './constants.js';
 import monster from './entity/monsters/monster.js';
 import { chasePlayer, chasePlayerIfClose, moveRandom, standStill } from './entity/monsters/behaviors.js';
 import createMenu from './menu.js';
+import craftingMenu from './player/crafting.js';
 import load from './load.js';
 import level0 from './levels/level0.js';
 
@@ -18,10 +19,33 @@ let currentControls = {};
 
 let inventoryMenu = null;
 let isInventoryOpen = false;
+let isCraftingOpen = false;
+
+const getInventory = (player) => {
+    const inventory = [];
+
+    for (let itemType in player.inventory) {
+        const itemCount = player.inventory[itemType];
+
+        inventory.push({
+            label: `${itemType}: ${itemCount}`,
+            id: itemType,
+            disabled: itemCount === 0,
+            actions: [
+                'use',
+                'drop',
+            ],
+        });
+    }
+
+    return inventory;
+};
 
 function draw(ctx) {
     if (isInventoryOpen) {
         inventoryMenu.draw(ctx, player);
+    } else if (isCraftingOpen) {
+        craftingMenu.draw(ctx, player);
     } else if (currentControls.map) {
         const MAP_GRID_SIZE = 4;
         const gridView = snapToGrid(player.x, player.y);
@@ -64,32 +88,23 @@ function update(controls, elapsedTime) {
 
     if (controls.inventory && !controls.previousControls.inventory) {
         isInventoryOpen = !isInventoryOpen;
+        isCraftingOpen = false;
     }
 
     if (player.addItemMenu) {
         isInventoryOpen = true;
+        isCraftingOpen = false;
     }
 
-    if (!isInventoryOpen && !controls.map) {
-        for (let i = 0; i < entityList.length; i++) {
-            entityList[i].update(controls, entityList, elapsedTime, player);
-        }
-    } else if (isInventoryOpen) {
-        const inventory = [];
+    if (controls.crafting  && !controls.previousControls.crafting) {
+        isCraftingOpen = !isCraftingOpen;
+        isInventoryOpen = false;
 
-        for (let itemType in player.inventory) {
-            const itemCount = player.inventory[itemType];
+        craftingMenu.updateMenuItems(player.inventory);
+    }
 
-            inventory.push({
-                label: `${itemType}: ${itemCount}`,
-                id: itemType,
-                disabled: itemCount === 0,
-                actions: [
-                    'use',
-                    'drop',
-                ],
-            });
-        }
+    if (isInventoryOpen) {
+        const inventory = getInventory(player);
 
         inventoryMenu.changeItems(inventory);
 
@@ -104,6 +119,20 @@ function update(controls, elapsedTime) {
                 entityList.push(droppedItem);
             }
         });
+    } else if (isCraftingOpen) {
+        craftingMenu.update(true, controls, (itemType) => {
+            isCraftingOpen = false;
+
+            if (itemType) {
+                player.craftItem(itemType);
+
+                craftingMenu.updateMenuItems(player.inventory);
+            }
+        });
+    } else if (!controls.map) {
+        for (let i = 0; i < entityList.length; i++) {
+            entityList[i].update(controls, entityList, elapsedTime, player);
+        }
     }
 }
 
@@ -115,6 +144,8 @@ loadGame((images) => {
         title: 'Inventory',
         cursorImage: sprites['arrow'],
     });
+
+    craftingMenu.initialize(sprites);
 
     player = playerFactory.create({
         x: 0,

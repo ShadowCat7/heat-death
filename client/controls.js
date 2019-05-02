@@ -5,6 +5,7 @@ const controlMap = {
     'KeyD': 'moveRight',
     'KeyE': 'interact',
     'KeyI': 'inventory',
+    'KeyC': 'crafting',
     'KeyM': 'map',
     'Space': 'attack',
     'Escape': 'escape',
@@ -24,6 +25,7 @@ const friendlyKeyMap = {
     'Escape': 'Escape',
     'KeyV': 'V',
     'KeyP': 'P',
+    'KeyC': 'C',
 };
 
 export const controlsToString = () => {

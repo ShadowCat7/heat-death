@@ -12,6 +12,7 @@ import item from '../entity/item.js';
 import stump from '../entity/stump.js';
 import createTimer from '../timer.js';
 import { drawRect } from '../draw-utility.js';
+import { CRAFTABLE_ITEMS } from './crafting.js';
 
 const MAX_SPEED = 300;
 const ATTACK_TIME_LIMIT = 0.3;
@@ -258,6 +259,20 @@ export default {
                 if (loseItems) {
                     player.inventory[itemType] = 0;
                 }
+            }
+        };
+
+        player.craftItem = (itemType) => {
+            const item = CRAFTABLE_ITEMS.find(item => item.name === itemType);
+
+            if (!player.inventory[item.name]) {
+                player.inventory[item.name] = 1;
+            } else {
+                player.inventory[item.name]++;
+            }
+
+            for (let itemName in item.cost) {
+                player.inventory[itemName] -= item.cost[itemName];
             }
         };
 

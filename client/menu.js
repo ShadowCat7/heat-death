@@ -56,7 +56,6 @@ export default ({
             if (cursorShown) {
                 if (isActionsOpen) {
                     const item = items[cursorPosition];
-                    const disabled = item.disabled;
                     const actions = item.actions;
                     const height = (actions.length + 1) * (LINE_HEIGHT + V_PADDING) + V_PADDING * 2;
 
@@ -74,7 +73,7 @@ export default ({
                         height: height - ACTION_MENU_BORDER * 2,
                     }, ACTION_MENU_X,
                         actionMenuY,
-                        '#000'
+                        '#000',
                     );
 
                     const textColor = item.disabled ? '#777' : '#e0e0e0';
