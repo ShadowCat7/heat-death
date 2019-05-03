@@ -3,7 +3,7 @@ import { snapToGrid } from './physics.js';
 import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH } from './constants.js';
 import monster from './entity/monsters/monster.js';
 import { chasePlayer, chasePlayerIfClose, moveRandom, standStill } from './entity/monsters/behaviors.js';
-import createMenu from './menu.js';
+import inventoryMenu from './player/inventory.js';
 import craftingMenu from './player/crafting.js';
 import load from './load.js';
 import level0 from './levels/level0.js';
@@ -17,35 +17,14 @@ let entityList = [];
 
 let currentControls = {};
 
-let inventoryMenu = null;
 let isInventoryOpen = false;
 let isCraftingOpen = false;
 
-const getInventory = (player) => {
-    const inventory = [];
-
-    for (let itemType in player.inventory) {
-        const itemCount = player.inventory[itemType];
-
-        inventory.push({
-            label: `${itemType}: ${itemCount}`,
-            id: itemType,
-            disabled: itemCount === 0,
-            actions: [
-                'use',
-                'drop',
-            ],
-        });
-    }
-
-    return inventory;
-};
-
 function draw(ctx) {
     if (isInventoryOpen) {
-        inventoryMenu.draw(ctx, player);
+        inventoryMenu.draw(ctx);
     } else if (isCraftingOpen) {
-        craftingMenu.draw(ctx, player);
+        craftingMenu.draw(ctx);
     } else if (currentControls.map) {
         const MAP_GRID_SIZE = 4;
         const gridView = snapToGrid(player.x, player.y);
@@ -89,11 +68,15 @@ function update(controls, elapsedTime) {
     if (controls.inventory && !controls.previousControls.inventory) {
         isInventoryOpen = !isInventoryOpen;
         isCraftingOpen = false;
+
+        inventoryMenu.updateMenuItems(player.inventory);
     }
 
     if (player.addItemMenu) {
         isInventoryOpen = true;
         isCraftingOpen = false;
+
+        inventoryMenu.updateMenuItems(player.inventory);
     }
 
     if (controls.crafting  && !controls.previousControls.crafting) {
@@ -104,10 +87,6 @@ function update(controls, elapsedTime) {
     }
 
     if (isInventoryOpen) {
-        const inventory = getInventory(player);
-
-        inventoryMenu.changeItems(inventory);
-
         inventoryMenu.update(true, controls, (itemType, action) => {
             isInventoryOpen = false;
             player.addItemMenu = false;
@@ -139,11 +118,7 @@ function update(controls, elapsedTime) {
 loadGame((images) => {
     sprites = images;
 
-    inventoryMenu = createMenu({
-        items: [],
-        title: 'Inventory',
-        cursorImage: sprites['arrow'],
-    });
+    inventoryMenu.initialize(sprites);
 
     craftingMenu.initialize(sprites);
 
