@@ -18,7 +18,7 @@ const ACTION_MENU_X = VIEW_WIDTH - ACTION_MENU_INTERIOR_WIDTH - ACTION_MENU_BORD
 
 const CANCEL = 'cancel';
 
-export default ({
+export default({
     items,
     title,
     cursorImage,

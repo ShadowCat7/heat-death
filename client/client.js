@@ -5,6 +5,7 @@ import monster from './entity/monsters/monster.js';
 import { chasePlayer, chasePlayerIfClose, moveRandom, standStill } from './entity/monsters/behaviors.js';
 import inventoryMenu from './player/inventory.js';
 import craftingMenu from './player/crafting.js';
+import speech from './player/speech.js';
 import load from './load.js';
 import level0 from './levels/level0.js';
 
@@ -59,11 +60,23 @@ function draw(ctx) {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
+
+        speech.draw(ctx);
     }
 }
 
 function update(controls, elapsedTime) {
     currentControls = controls;
+
+    if (player.isTalking) {
+        speech.open(['Hello!', 'My dialogue has 3 lines.', 'See?']);
+
+        speech.update(controls, () => {
+            player.isTalking = false;
+        });
+
+        return;
+    }
 
     if (controls.inventory && !controls.previousControls.inventory) {
         isInventoryOpen = !isInventoryOpen;
@@ -121,6 +134,8 @@ loadGame((images) => {
     inventoryMenu.initialize(sprites);
 
     craftingMenu.initialize(sprites);
+
+    speech.initialize(sprites);
 
     player = playerFactory.create({
         x: 0,

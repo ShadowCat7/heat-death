@@ -192,6 +192,8 @@ export default {
                             x: entity.x,
                             y: entity.y,
                         });
+                    } else if (entity.type === 'person') {
+                        player.isTalking = true;
                     }
                 } else {
                     entityList[closestItemIndex].inInteractRange = true;

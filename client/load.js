@@ -1,6 +1,7 @@
 import block from './entity/block.js';
 import fire from './entity/fire.js';
 import tree from './entity/tree.js';
+import person from './entity/person.js';
 
 export default (saveData) => {
     return saveData.map(e => {
@@ -14,6 +15,9 @@ export default (saveData) => {
                 break;
             case 'block':
                 genFunction = block.create;
+                break;
+            case 'person':
+                genFunction = person.create;
                 break;
             default:
                 console.error('This entity type does not exist (load.js).');
