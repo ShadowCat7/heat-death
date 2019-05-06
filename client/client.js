@@ -10,7 +10,7 @@ import speech from './player/speech.js';
 import load from './load.js';
 import level0 from './levels/level0.js';
 import { loadGame, startGame } from './utility/game.js';
-import clock from './hud/clock.js';
+import hud from './hud/hud.js';
 
 let sprites = null;
 
@@ -49,22 +49,9 @@ function draw(ctx) {
             entityList[i].draw(ctx, viewX, viewY, player);
         }
 
-        // player health bar
-        ctx.fillStyle = '#909090';
-        ctx.fillRect(0, 0, VIEW_WIDTH, HP_BAR_HEIGHT);
-
-        ctx.fillStyle = 'green';
-        ctx.fillRect(3, 3, player.health / 1000 * (VIEW_WIDTH - 6), 15);
-
-        ctx.font = '12px Arial';
-        ctx.fillStyle = '#eee';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
-
         speech.draw(ctx);
 
-        clock.draw(ctx);
+        hud.draw(ctx, player);
     }
 }
 
@@ -125,7 +112,7 @@ function update(controls, elapsedTime) {
             }
         });
     } else if (!controls.map) {
-        clock.update(elapsedTime);
+        hud.update(elapsedTime);
 
         for (let i = 0; i < entityList.length; i++) {
             entityList[i].update(controls, entityList, elapsedTime, player);
