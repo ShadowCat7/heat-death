@@ -8,16 +8,17 @@ import inventoryMenu from './player/inventory.js';
 import craftingMenu from './player/crafting.js';
 import speech from './player/speech.js';
 import load from './load.js';
-import level0 from './levels/level0.js';
+import level0_0 from './levels/level0_0.js';
+import level1_0 from './levels/level1_0.js';
 import { loadGame, startGame } from './utility/game.js';
 import hud from './hud/hud.js';
 
 import './cheats.js';
+import levels from './levels/levels.js';
 
 let sprites = null;
 
 let player = null;
-let entityList = [];
 
 let currentControls = {};
 
@@ -30,26 +31,9 @@ function draw(ctx) {
     } else if (isCraftingOpen) {
         craftingMenu.draw(ctx);
     } else if (currentControls.map) {
-        const MAP_GRID_SIZE = 4;
-        const gridView = snapToGrid(player.x, player.y);
-        gridView.x = gridView.x / GRID_SIZE * MAP_GRID_SIZE - 400;
-        gridView.y = gridView.y / GRID_SIZE * MAP_GRID_SIZE - 300;
-
-        for (let i = 0; i < entityList.length; i++) {
-            const entity = entityList[i];
-            const x = entity.x / GRID_SIZE * MAP_GRID_SIZE - gridView.x;
-            const y = entity.y / GRID_SIZE * MAP_GRID_SIZE - gridView.y;
-
-            ctx.fillStyle = entity.color || '#ffffff';
-            ctx.fillRect(x, y, MAP_GRID_SIZE, MAP_GRID_SIZE);
-        }
+        levels.drawMap(ctx, player);
     } else {
-        let viewX = player.x - VIEW_WIDTH / 2 + player.rect.width / 2;
-        let viewY = player.y - VIEW_HEIGHT / 2 + player.rect.height / 2;
-
-        for (let i = 0; i < entityList.length; i++) {
-            entityList[i].draw(ctx, viewX, viewY, player);
-        }
+        levels.draw(ctx, player);
 
         speech.draw(ctx);
 
@@ -100,7 +84,7 @@ function update(controls, elapsedTime) {
 
             const droppedItem = player.useItem(itemType, action);
             if (droppedItem) {
-                entityList.push(droppedItem);
+                levels.createEntity(droppedItem);
             }
         });
     } else if (isCraftingOpen) {
@@ -116,9 +100,7 @@ function update(controls, elapsedTime) {
     } else if (!controls.map) {
         hud.update(elapsedTime);
 
-        for (let i = 0; i < entityList.length; i++) {
-            entityList[i].update(controls, entityList, elapsedTime, player);
-        }
+        levels.update(controls, elapsedTime, player);
     }
 }
 
@@ -140,12 +122,12 @@ loadGame((images) => {
     entityList.push(monster);*/
 
     player = playerFactory.create({
-        x: 0,
-        y: 0,
+        x: 280,
+        y: 280,
     });
-    entityList.push(player);
 
-    entityList = entityList.concat(load(level0));
+    levels.insert(load(level0_0), 0, 0);
+    levels.insert(load(level1_0), 1, 0);
 
     startGame(update, draw);
 });

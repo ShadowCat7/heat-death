@@ -1,5 +1,6 @@
 import entityFactory, { defaultDrawFunc } from './entity.js';
 import { isEntitiesColliding } from '../utility/physics.js';
+import { standStill } from './monsters/behaviors.js';
 
 const MAX_SPEED = 20;
 
@@ -52,7 +53,9 @@ export default {
             }
         };
 
-        person.behavior = options.behavior(person);
+        person.behavior = options.behavior ?
+            options.behavior(person) :
+            standStill(person);
 
         return person;
     },

@@ -1,5 +1,5 @@
 import { snapToGrid } from '../utility/physics.js';
-import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
+import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH, LEVEL_HEIGHT, LEVEL_WIDTH } from '../constants.js';
 
 import block from '../entity/block.js';
 import item from '../entity/item.js';
@@ -10,7 +10,10 @@ import clickableFactory from './click-element.js';
 import { loadGame, startGame } from '../utility/game.js';
 import { drawLine, drawRect } from '../utility/draw-utility.js';
 import save from './save.js';
-import playerFactory from '../player/player.js';
+import person from '../entity/person.js';
+
+const PANEL_PAD = 10;
+const PANEL_WIDTH = GRID_SIZE * 2 + PANEL_PAD * 3;
 
 let sprites = null;
 
@@ -19,7 +22,7 @@ const clickElements = [];
 
 let currentControls = {};
 
-let cameraX = 0;
+let cameraX = -PANEL_WIDTH;
 let cameraY = 0;
 const CAMERA_MAX_SPEED = 300;
 
@@ -30,19 +33,12 @@ let mouseY = 0;
 
 let selectedElement = null;
 
-const PANEL_PAD = 10;
-const PANEL_WIDTH = GRID_SIZE * 2 + PANEL_PAD * 3;
-
-const player = playerFactory.create({
-    x: 0,
-    y: 0,
-});
-
 const entityTypeMap = {
     'block': block.create,
     'fire': fire.create,
     'item': item.create,
     'tree': tree.create,
+    'person': person.create,
 };
 
 function draw(ctx) {
@@ -73,8 +69,6 @@ function draw(ctx) {
             const y = startingGridLine.y - cameraY + i;
             drawLine(ctx, 0, y, VIEW_WIDTH, y, '#aaa');
         }
-
-        player.draw(ctx, cameraX, cameraY);
 
         for (let coordinates in entityMap) {
             entityMap[coordinates].draw(ctx, cameraX, cameraY);
@@ -121,6 +115,11 @@ function update(controls, elapsedTime) {
 
     cameraX += newX;
     cameraY += newY;
+
+    cameraX = Math.max(cameraX, -PANEL_WIDTH);
+    cameraX = Math.min(cameraX, LEVEL_WIDTH - VIEW_WIDTH);
+    cameraY = Math.max(cameraY, 0);
+    cameraY = Math.min(cameraY, LEVEL_HEIGHT - VIEW_HEIGHT);
 
     if (controls.save && !controls.previousControls.save) {
         save(entityMap);
