@@ -1,5 +1,5 @@
 import { VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
-import { drawRect } from '../draw-utility.js';
+import { drawRect } from '../utility/draw-utility.js';
 
 const V_PADDING = 10;
 const H_PADDING = 10;

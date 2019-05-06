@@ -1,4 +1,4 @@
-import { isInsideRect } from '../physics.js';
+import { isInsideRect } from '../utility/physics.js';
 
 const createClickElement = ({
     x,

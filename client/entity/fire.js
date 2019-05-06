@@ -1,5 +1,5 @@
 import entityFactory, { defaultDrawFunc } from '../entity/entity.js';
-import createTimer from '../timer.js';
+import createTimer from '../utility/timer.js';
 import { VIEW_WIDTH } from '../constants.js';
 
 export default {

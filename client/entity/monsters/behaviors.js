@@ -1,5 +1,5 @@
-import createTimer from '../../timer.js';
-import { distance, getDirection } from '../../physics.js';
+import createTimer from '../../utility/timer.js';
+import { distance, getDirection } from '../../utility/physics.js';
 
 export const moveRandom = (monster) => {
     const timer = createTimer(Math.random() * 4 + 3);

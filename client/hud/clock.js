@@ -1,5 +1,5 @@
-import createTimer from './timer.js';
-import { VIEW_WIDTH, HP_BAR_HEIGHT } from './constants.js';
+import createTimer from '../utility/timer.js';
+import { VIEW_WIDTH, HP_BAR_HEIGHT } from '../constants.js';
 
 const V_PADDING = 10;
 const H_PADDING = 10;

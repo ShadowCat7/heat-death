@@ -1,16 +1,16 @@
-import { snapToGrid } from './physics.js';
-import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH } from './constants.js';
+import { snapToGrid } from '../utility/physics.js';
+import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
 
-import block from './entity/block.js';
-import item from './entity/item.js';
-import fire from './entity/fire.js';
-import tree from './entity/tree.js';
-import clickableFactory from './map-making/click-element.js';
+import block from '../entity/block.js';
+import item from '../entity/item.js';
+import fire from '../entity/fire.js';
+import tree from '../entity/tree.js';
+import clickableFactory from './click-element.js';
 
-import { loadGame, startGame } from './game.js';
-import { drawLine, drawRect } from './draw-utility.js';
-import save from './map-making/save.js';
-import playerFactory from './player/player.js';
+import { loadGame, startGame } from '../utility/game.js';
+import { drawLine, drawRect } from '../utility/draw-utility.js';
+import save from './save.js';
+import playerFactory from '../player/player.js';
 
 let sprites = null;
 

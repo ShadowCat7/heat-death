@@ -1,6 +1,6 @@
 import entityFactory from '../entity/entity.js';
-import { drawRect } from '../draw-utility.js';
-import { isRectsColliding } from '../physics.js';
+import { drawRect } from '../utility/draw-utility.js';
+import { isRectsColliding } from '../utility/physics.js';
 
 export default {
     create: (options) => {

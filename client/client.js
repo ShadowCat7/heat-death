@@ -1,6 +1,6 @@
 import playerFactory from './player/player.js';
 import monsterFactory from './entity/monsters/monster.js';
-import { snapToGrid } from './physics.js';
+import { snapToGrid } from './utility/physics.js';
 import { GRID_SIZE, HP_BAR_HEIGHT, VIEW_HEIGHT, VIEW_WIDTH } from './constants.js';
 import monster from './entity/monsters/monster.js';
 import { chasePlayer, chasePlayerIfClose, moveRandom, standStill } from './entity/monsters/behaviors.js';
@@ -9,8 +9,8 @@ import craftingMenu from './player/crafting.js';
 import speech from './player/speech.js';
 import load from './load.js';
 import level0 from './levels/level0.js';
-import { loadGame, startGame } from './game.js';
-import clock from './clock.js';
+import { loadGame, startGame } from './utility/game.js';
+import clock from './hud/clock.js';
 
 let sprites = null;
 

@@ -1,4 +1,4 @@
-import { drawRect } from '../draw-utility.js';
+import { drawRect } from '../utility/draw-utility.js';
 
 export const defaultDrawFunc = (entity) => {
     return (ctx, viewX, viewY, player) => {

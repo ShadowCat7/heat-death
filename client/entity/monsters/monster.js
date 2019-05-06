@@ -1,5 +1,5 @@
 import entityFactory from '../entity.js';
-import { isEntitiesColliding } from '../../physics.js';
+import { isEntitiesColliding } from '../../utility/physics.js';
 
 const MAX_SPEED = 150;
 

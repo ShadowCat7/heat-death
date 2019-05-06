@@ -1,4 +1,4 @@
-import createMenu from '../menu.js';
+import createMenu from '../utility/menu.js';
 
 export const CRAFTABLE_ITEMS = [{
     name: 'shelter',

@@ -5,13 +5,13 @@ import {
     isEntitiesColliding,
     isRectsColliding,
     rectEntityDistance,
-} from '../physics.js';
+} from '../utility/physics.js';
 
 import { GRID_SIZE, INTERACT_RADIUS, VIEW_WIDTH } from '../constants.js';
 import item from '../entity/item.js';
 import stump from '../entity/stump.js';
-import createTimer from '../timer.js';
-import { drawRect } from '../draw-utility.js';
+import createTimer from '../utility/timer.js';
+import { drawRect } from '../utility/draw-utility.js';
 import { CRAFTABLE_ITEMS } from './crafting.js';
 
 const MAX_SPEED = 300;
