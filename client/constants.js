@@ -4,3 +4,5 @@ export const INTERACT_RADIUS = 30;
 
 export const VIEW_WIDTH = 800;
 export const VIEW_HEIGHT = 600;
+
+export const HP_BAR_HEIGHT = 21;

@@ -1,6 +1,7 @@
 import playerFactory from './player/player.js';
+import monsterFactory from './entity/monsters/monster.js';
 import { snapToGrid } from './physics.js';
-import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH } from './constants.js';
+import { GRID_SIZE, HP_BAR_HEIGHT, VIEW_HEIGHT, VIEW_WIDTH } from './constants.js';
 import monster from './entity/monsters/monster.js';
 import { chasePlayer, chasePlayerIfClose, moveRandom, standStill } from './entity/monsters/behaviors.js';
 import inventoryMenu from './player/inventory.js';
@@ -8,8 +9,8 @@ import craftingMenu from './player/crafting.js';
 import speech from './player/speech.js';
 import load from './load.js';
 import level0 from './levels/level0.js';
-
 import { loadGame, startGame } from './game.js';
+import clock from './clock.js';
 
 let sprites = null;
 
@@ -50,7 +51,7 @@ function draw(ctx) {
 
         // player health bar
         ctx.fillStyle = '#909090';
-        ctx.fillRect(0, 0, VIEW_WIDTH, 21);
+        ctx.fillRect(0, 0, VIEW_WIDTH, HP_BAR_HEIGHT);
 
         ctx.fillStyle = 'green';
         ctx.fillRect(3, 3, player.health / 1000 * (VIEW_WIDTH - 6), 15);
@@ -62,6 +63,8 @@ function draw(ctx) {
         ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
 
         speech.draw(ctx);
+
+        clock.draw(ctx);
     }
 }
 
@@ -122,6 +125,8 @@ function update(controls, elapsedTime) {
             }
         });
     } else if (!controls.map) {
+        clock.update(elapsedTime);
+
         for (let i = 0; i < entityList.length; i++) {
             entityList[i].update(controls, entityList, elapsedTime, player);
         }
@@ -136,6 +141,14 @@ loadGame((images) => {
     craftingMenu.initialize(sprites);
 
     speech.initialize(sprites);
+
+    /*
+    const monster = monsterFactory.create({
+        x: -440,
+        y: -440,
+        behavior: chasePlayerIfClose,
+    });
+    entityList.push(monster);*/
 
     player = playerFactory.create({
         x: 0,
