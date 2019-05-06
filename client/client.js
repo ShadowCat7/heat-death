@@ -12,6 +12,8 @@ import level0 from './levels/level0.js';
 import { loadGame, startGame } from './utility/game.js';
 import hud from './hud/hud.js';
 
+import './cheats.js';
+
 let sprites = null;
 
 let player = null;

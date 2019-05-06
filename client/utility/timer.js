@@ -17,5 +17,8 @@ export default (timeLimit) => {
         getTime: () => {
             return time;
         },
+        reset: () => {
+            time = 0;
+        },
     };
 };
