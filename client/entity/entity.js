@@ -2,10 +2,12 @@ import { drawRect } from '../utility/draw-utility.js';
 
 export const defaultDrawFunc = (entity) => {
     return (ctx, viewX, viewY, player) => {
-        if (entity.rect) {
-            const x = entity.x - viewX;
-            const y = entity.y - viewY;
+        const x = entity.x - viewX;
+        const y = entity.y - viewY;
 
+        if (entity.image) {
+            ctx.drawImage(entity.image, x, y);
+        } else if (entity.rect) {
             drawRect(ctx, entity.rect, x, y, entity.color || '#ffffff');
         }
 

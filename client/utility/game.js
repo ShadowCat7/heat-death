@@ -1,6 +1,6 @@
 import engineFactory from './engine.js';
 import loadImages from './image-loader.js';
-import spriteData from './sprite.js';
+import spriteData from '../sprite.js';
 import { controlsToString, getControls } from './controls.js';
 
 let canvas = null;

@@ -166,6 +166,8 @@ export default {
             }
 
             if (closestItemIndex !== null) {
+                entityList[closestItemIndex].inInteractRange = true;
+
                 if (controls.interact && !controls.previousControls.interact) {
                     const entity = entityList[closestItemIndex];
 
@@ -192,11 +194,9 @@ export default {
                             x: entity.x,
                             y: entity.y,
                         });
-                    } else if (entity.type === 'person') {
-                        player.isTalking = true;
+                    } else if (entity.talkable) {
+                        player.talkingTo = entity;
                     }
-                } else {
-                    entityList[closestItemIndex].inInteractRange = true;
                 }
             }
 

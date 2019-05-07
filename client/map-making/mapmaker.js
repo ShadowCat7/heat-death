@@ -9,15 +9,16 @@ import clickableFactory from './click-element.js';
 
 import { loadGame, startGame } from '../utility/game.js';
 import { drawLine, drawRect } from '../utility/draw-utility.js';
-import save from './save.js';
+import uiControls from './ui-controls.js';
 import person from '../entity/person.js';
+import sign from '../entity/sign.js';
 
 const PANEL_PAD = 10;
 const PANEL_WIDTH = GRID_SIZE * 2 + PANEL_PAD * 3;
 
 let sprites = null;
 
-const entityMap = {};
+let entityMap = {};
 const clickElements = [];
 
 let currentControls = {};
@@ -27,6 +28,7 @@ let cameraY = 0;
 const CAMERA_MAX_SPEED = 300;
 
 let leftMouseClick = false;
+let middleMouseClick = false;
 let rightMouseClick = false;
 let mouseX = 0;
 let mouseY = 0;
@@ -39,6 +41,7 @@ const entityTypeMap = {
     'item': item.create,
     'tree': tree.create,
     'person': person.create,
+    'sign': sign.create,
 };
 
 function draw(ctx) {
@@ -122,7 +125,23 @@ function update(controls, elapsedTime) {
     cameraY = Math.min(cameraY, LEVEL_HEIGHT - VIEW_HEIGHT);
 
     if (controls.save && !controls.previousControls.save) {
-        save(entityMap);
+        uiControls.save(entityMap);
+    }
+
+    if (controls.load && !controls.previousControls.load) {
+        const entities = uiControls.load();
+
+        if (!entities) return;
+
+        entityMap = {};
+
+        for (let i = 0; i < entities.length; i++) {
+            const entity = entities[i];
+
+            const coordinate = `x${entity.x}y${entity.y}`;
+
+            entityMap[coordinate] = entity;
+        }
     }
 
     for (let i = 0; i < clickElements.length; i++) {
@@ -160,12 +179,18 @@ function update(controls, elapsedTime) {
             });
         } else if (rightMouseClick) {
             delete entityMap[coordinate];
+        } else if (middleMouseClick) {
+            uiControls.showData(entityMap[coordinate]);
+        } else if (controls.storeData && !controls.previousControls.storeData) {
+            uiControls.storeData(entityMap[coordinate]);
         }
     }
 }
 
 loadGame((images) => {
     sprites = images;
+
+    sign.initialize(sprites);
 
     let x = PANEL_PAD;
     let y = PANEL_PAD;
@@ -203,6 +228,7 @@ loadGame((images) => {
         e.preventDefault();
 
         leftMouseClick = e.button === 0;
+        middleMouseClick = e.button === 1;
         rightMouseClick = e.button === 2;
         mouseX = e.clientX;
         mouseY = e.clientY;
@@ -214,6 +240,8 @@ loadGame((images) => {
 
         if (e.button === 0) {
             leftMouseClick = false;
+        } else if (e.button === 1) {
+            middleMouseClick = false;
         } else if (e.button === 2) {
             rightMouseClick = false;
         }

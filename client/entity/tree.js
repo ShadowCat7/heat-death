@@ -1,5 +1,5 @@
 import entityFactory from '../entity/entity.js';
-import { drawRect } from '../utility/draw-utility.js';
+import { drawInteractText, drawRect } from '../utility/draw-utility.js';
 import { isRectsColliding } from '../utility/physics.js';
 
 export default {
@@ -41,11 +41,7 @@ export default {
             }, x - entity.rect.width, y - entity.rect.height * 3, isPlayerBehindTree ? '#33996699' : '#339966');
 
             if (entity.inInteractRange) {
-                ctx.font = '22px Arial';
-                ctx.fillStyle = '#eee';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.fillText('Cut down tree', x + entity.rect.width / 2, y);
+                drawInteractText(ctx, viewX, viewY, 'Cut down tree', entity);
             }
         };
 

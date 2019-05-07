@@ -11,6 +11,8 @@ const controlMap = {
     'Escape': 'escape',
     'KeyV': 'showDevInfo',
     'KeyP': 'save',
+    'Period': 'load',
+    'KeyO': 'storeData',
 };
 
 const friendlyKeyMap = {
@@ -24,8 +26,10 @@ const friendlyKeyMap = {
     'Space': 'Spacebar',
     'Escape': 'Escape',
     'KeyV': 'V',
-    'KeyP': 'P',
     'KeyC': 'C',
+    'KeyP': 'P',
+    'Period': 'Period',
+    'KeyO': 'O',
 };
 
 export const controlsToString = () => {

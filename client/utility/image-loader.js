@@ -1,4 +1,4 @@
-import spriteData from './sprite.js';
+import spriteData from '../sprite.js';
 
 let image = null;
 

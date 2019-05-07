@@ -10,3 +10,14 @@ export const drawLine = (ctx, startX, startY, endX, endY, color) => {
     ctx.strokeStyle = color;
     ctx.stroke();
 };
+
+export const drawInteractText = (ctx, viewX, viewY, action, entity) => {
+    const x = entity.x - viewX;
+    const y = entity.y - viewY;
+
+    ctx.font = '22px Arial';
+    ctx.fillStyle = '#eee';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(action, x + entity.rect.width / 2, y);
+};

@@ -7,7 +7,7 @@ export default {
         options.causesCollisions = true;
         options.type = 'stump';
 
-        options.interactive = true;
+        options.interactive = false;
 
         options.update = null;
 

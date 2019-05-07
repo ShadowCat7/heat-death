@@ -15,6 +15,7 @@ import hud from './hud/hud.js';
 
 import './cheats.js';
 import levels from './levels/levels.js';
+import sign from './entity/sign.js';
 
 let sprites = null;
 
@@ -44,11 +45,11 @@ function draw(ctx) {
 function update(controls, elapsedTime) {
     currentControls = controls;
 
-    if (player.isTalking) {
-        speech.open(['Hello!', 'My dialogue has 3 lines.', 'See?']);
+    if (player.talkingTo) {
+        speech.open(player.talkingTo.getText());
 
         speech.update(controls, () => {
-            player.isTalking = false;
+            player.talkingTo = null;
         });
 
         return;
@@ -112,6 +113,8 @@ loadGame((images) => {
     craftingMenu.initialize(sprites);
 
     speech.initialize(sprites);
+
+    sign.initialize(sprites);
 
     /*
     const monster = monsterFactory.create({

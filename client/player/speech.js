@@ -35,7 +35,7 @@ export default {
         if (controls.interact && !controls.previousControls.interact) {
             textIndex += 2;
 
-            if (textIndex > textToShow.length) {
+            if (textIndex >= textToShow.length) {
                 isOpen = false;
                 textIndex = 0;
                 closeCallback();
@@ -63,7 +63,7 @@ export default {
         ctx.fillText(textToShow[textIndex], TEXT_X, TEXT_Y);
         ctx.fillText(textToShow[textIndex + 1] || '', TEXT_X, TEXT_Y + LINE_HEIGHT + V_PADDING);
 
-        if (textIndex + 1 < textToShow.length) {
+        if (textIndex + 2 < textToShow.length) {
             ctx.drawImage(cursorImage, CURSOR_X, CURSOR_Y);
         } else {
             drawRect(ctx, {

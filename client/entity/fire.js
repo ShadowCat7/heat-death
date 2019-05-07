@@ -1,6 +1,6 @@
 import entityFactory, { defaultDrawFunc } from '../entity/entity.js';
 import createTimer from '../utility/timer.js';
-import { VIEW_WIDTH } from '../constants.js';
+import { drawInteractText } from '../utility/draw-utility.js';
 
 export default {
     create: (options) => {
@@ -33,15 +33,8 @@ export default {
         entity.draw = (ctx, viewX, viewY, player) => {
             defaultDraw(ctx, viewX, viewY);
 
-            const x = entity.x - viewX;
-            const y = entity.y - viewY;
-
             if (entity.inInteractRange) {
-                ctx.font = '22px Arial';
-                ctx.fillStyle = '#eee';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.fillText('Fuel the fire', x + entity.rect.width / 2, y);
+                drawInteractText(ctx, viewX, viewY, 'Fuel the fire', entity);
             }
         };
 
