@@ -20,6 +20,8 @@ export default {
             entities[i].y += levelY;
         }
 
+        entityList = entityList.concat(entities);
+
         levels[x][y] = entities;
     },
     draw: (ctx, player) => {
@@ -36,8 +38,6 @@ export default {
         map.draw(ctx, player, entityList);
     },
     update: (controls, elapsedTime, player) => {
-        entityList = levels[0][0].concat(levels[1][0]);
-
         for (let i = 0; i < entityList.length; i++) {
             entityList[i].update(controls, entityList, elapsedTime, player);
         }
