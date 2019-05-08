@@ -59,6 +59,7 @@ function update(controls, elapsedTime) {
         isInventoryOpen = !isInventoryOpen;
         isCraftingOpen = false;
 
+        inventoryMenu.changeTitle('Inventory');
         inventoryMenu.updateMenuItems(player.inventory);
     }
 
@@ -66,6 +67,7 @@ function update(controls, elapsedTime) {
         isInventoryOpen = true;
         isCraftingOpen = false;
 
+        inventoryMenu.changeTitle('Use Item');
         inventoryMenu.updateMenuItems(player.inventory);
     }
 
@@ -78,14 +80,25 @@ function update(controls, elapsedTime) {
 
     if (isInventoryOpen) {
         inventoryMenu.update(true, controls, (itemType, action) => {
-            isInventoryOpen = false;
             player.addItemMenu = false;
 
-            if (!itemType) return;
+            if (!itemType) {
+                isInventoryOpen = false;
+            } else if (action === 'drop') {
+                const droppedItem = player.dropItem(itemType, action);
+                if (droppedItem) {
+                    levels.createEntity(droppedItem);
+                }
 
-            const droppedItem = player.useItem(itemType, action);
-            if (droppedItem) {
-                levels.createEntity(droppedItem);
+                isInventoryOpen = false;
+            } else {
+                const actionSucceeded = player.useItem(itemType);
+
+                if (actionSucceeded) {
+                    isInventoryOpen = false;
+                } else {
+                    inventoryMenu.alert('Nothing happens');
+                }
             }
         });
     } else if (isCraftingOpen) {

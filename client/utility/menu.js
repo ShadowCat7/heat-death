@@ -10,13 +10,23 @@ const STARTING_LINE = V_PADDING + V_PADDING + LINE_HEIGHT;
 
 const LINE_COUNT = Math.floor((VIEW_HEIGHT - STARTING_LINE) / (LINE_HEIGHT + V_PADDING));
 
+const BORDER_COLOR = '#e0e0e0';
+const TEXT_COLOR = '#e0e0e0';
+const DISABLED_TEXT_COLOR = '#777';
+const BACKGROUND_COLOR = '#000';
+
 const ACTION_MENU_BORDER = 5;
 const ACTION_MENU_WIDTH = 200;
 const ACTION_MENU_TOTAL_WIDTH = ACTION_MENU_WIDTH + ACTION_MENU_BORDER * 2 + H_TEXT_PADDING + H_PADDING;
 const ACTION_MENU_INTERIOR_WIDTH = ACTION_MENU_TOTAL_WIDTH - ACTION_MENU_BORDER * 2;
 const ACTION_MENU_X = VIEW_WIDTH - ACTION_MENU_INTERIOR_WIDTH - ACTION_MENU_BORDER;
 
-const CANCEL = 'cancel';
+const ALERT_WIDTH = 400;
+const ALERT_HEIGHT = ACTION_MENU_BORDER * 2 + V_PADDING * 2 + LINE_HEIGHT;
+const ALERT_X = VIEW_WIDTH / 2 - ALERT_WIDTH / 2;
+const ALERT_Y = VIEW_HEIGHT / 2 - ALERT_HEIGHT / 2;
+
+const CANCEL_TEXT = 'cancel';
 
 export default({
     items,
@@ -27,21 +37,29 @@ export default({
     let cursorActionPosition = 0;
     let cursorShown = false;
     let isActionsOpen = false;
+    let alertText = null;
+    let titleText = null;
 
     return {
+        alert: (text) => {
+            alertText = text;
+        },
+        changeTitle: (title) => {
+            titleText = title;
+        },
         changeItems: (newItems) => {
             items = newItems;
         },
         draw: (ctx) => {
             ctx.font = '30px Arial';
-            ctx.fillStyle = '#e0e0e0';
+            ctx.fillStyle = TEXT_COLOR;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
-            ctx.fillText(title, VIEW_WIDTH / 2, V_PADDING);
+            ctx.fillText(titleText, VIEW_WIDTH / 2, V_PADDING);
 
             items.forEach((item, i) => {
                 ctx.font = '30px Arial';
-                ctx.fillStyle = '#e0e0e0';
+                ctx.fillStyle = TEXT_COLOR;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
 
@@ -63,7 +81,7 @@ export default({
                     drawRect(ctx, {
                         width: ACTION_MENU_TOTAL_WIDTH,
                         height,
-                    }, VIEW_WIDTH - ACTION_MENU_TOTAL_WIDTH, VIEW_HEIGHT - height, '#e0e0e0');
+                    }, VIEW_WIDTH - ACTION_MENU_TOTAL_WIDTH, VIEW_HEIGHT - height, BORDER_COLOR);
 
                     const actionMenuY = VIEW_HEIGHT - height + ACTION_MENU_BORDER;
 
@@ -73,10 +91,10 @@ export default({
                         height: height - ACTION_MENU_BORDER * 2,
                     }, ACTION_MENU_X,
                         actionMenuY,
-                        '#000',
+                        BACKGROUND_COLOR,
                     );
 
-                    const textColor = item.disabled ? '#777' : '#e0e0e0';
+                    const textColor = item.disabled ? DISABLED_TEXT_COLOR : TEXT_COLOR;
 
                     let i = 0;
                     actions.forEach((action) => {
@@ -92,13 +110,13 @@ export default({
                     });
 
                     ctx.font = '30px Arial';
-                    ctx.fillStyle = '#e0e0e0';
+                    ctx.fillStyle = TEXT_COLOR;
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'top';
 
                     const vPosition = actionMenuY + V_PADDING + (V_PADDING + LINE_HEIGHT) * i;
 
-                    ctx.fillText(CANCEL, ACTION_MENU_X + H_TEXT_PADDING, vPosition);
+                    ctx.fillText(CANCEL_TEXT, ACTION_MENU_X + H_TEXT_PADDING, vPosition);
 
                     const cursorX = ACTION_MENU_X + H_PADDING;
                     const cursorY = actionMenuY + V_PADDING + (V_PADDING + LINE_HEIGHT) * cursorActionPosition;
@@ -115,11 +133,38 @@ export default({
 
                 ctx.drawImage(cursorImage, xPosition, V_PADDING + (V_PADDING + LINE_HEIGHT) * (yPosition + 1) - 2);
             }
+
+            if (alertText) {
+                drawRect(ctx, {
+                    width: ALERT_WIDTH,
+                    height: ALERT_HEIGHT,
+                }, ALERT_X,
+                    ALERT_Y,
+                    BORDER_COLOR,
+                );
+
+                drawRect(ctx, {
+                    width: ALERT_WIDTH - ACTION_MENU_BORDER * 2,
+                    height: ALERT_HEIGHT - ACTION_MENU_BORDER * 2,
+                }, ALERT_X + ACTION_MENU_BORDER,
+                    ALERT_Y + ACTION_MENU_BORDER,
+                    BACKGROUND_COLOR,
+                );
+
+                ctx.font = '30px Arial';
+                ctx.fillStyle = TEXT_COLOR;
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+
+                ctx.fillText(alertText, ALERT_X + ACTION_MENU_BORDER + H_PADDING, ALERT_Y + ACTION_MENU_BORDER + V_PADDING);
+            }
         },
         update: (showCursor, controls, chooseCallback) => {
             cursorShown = showCursor;
 
-            if (cursorShown) {
+            if (alertText && controls.interact && !controls.previousControls.interact) {
+                alertText = null;
+            } else if (cursorShown) {
                 if (controls.moveUp && !controls.previousControls.moveUp) {
                     if (isActionsOpen) {
                         cursorActionPosition--;

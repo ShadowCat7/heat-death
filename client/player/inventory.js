@@ -28,6 +28,12 @@ const getInventory = (inventory) => {
 };
 
 export default {
+    alert: (alertText) => {
+        inventoryMenu.alert(alertText);
+    },
+    changeTitle: (title) => {
+        inventoryMenu.changeTitle(title);
+    },
     initialize: (sprites) => {
         inventoryMenu = createMenu({
             items: [],

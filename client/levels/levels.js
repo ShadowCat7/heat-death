@@ -45,7 +45,7 @@ export default {
         player.update(controls, entityList, elapsedTime, player);
     },
     createEntity: (entity) => {
-        levels[0][0].push(entity);
+        entityList.push(entity);
     },
     load: () => {
 

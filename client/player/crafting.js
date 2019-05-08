@@ -5,6 +5,11 @@ export const CRAFTABLE_ITEMS = [{
     cost: {
         'wood': 30,
     },
+}, {
+    name: 'cauldron',
+    cost: {
+        'metal': 10,
+    },
 }];
 
 let craftingMenu = null;

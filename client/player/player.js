@@ -7,7 +7,7 @@ import {
     rectEntityDistance,
 } from '../utility/physics.js';
 
-import { GRID_SIZE, INTERACT_RADIUS, VIEW_WIDTH } from '../constants.js';
+import { GRID_SIZE, INTERACT_RADIUS } from '../constants.js';
 import item from '../entity/item.js';
 import stump from '../entity/stump.js';
 import createTimer from '../utility/timer.js';
@@ -16,9 +16,11 @@ import { CRAFTABLE_ITEMS } from './crafting.js';
 
 const MAX_SPEED = 300;
 const ATTACK_TIME_LIMIT = 0.3;
-const attackTimer = createTimer(ATTACK_TIME_LIMIT);
+
 const SWORD_WIDTH = 10;
 const SWORD_LENGTH = 30;
+
+const attackTimer = createTimer(ATTACK_TIME_LIMIT);
 
 const getSwordPosition = (player, direction) => {
     let swordX = player.x;
@@ -60,7 +62,9 @@ export default {
 
         options.type = 'player';
 
-        options.inventory = {};
+        options.inventory = {
+            metal: 10,
+        };
         options.health = 100;
 
         let direction = null;
@@ -182,7 +186,7 @@ export default {
                         }
                     } else if (entity.type === 'fire') {
                         player.addItemMenu = true;
-                        interactWith = 'fire';
+                        interactWith = entity;
                     } else if (entity.type === 'tree') {
                         if (!player.inventory.wood) {
                             player.inventory.wood = 10;
@@ -223,45 +227,53 @@ export default {
             }
         };
 
-        player.useItem = (itemType, action) => {
+        player.dropItem = (itemType) => {
             const itemCount = player.inventory[itemType];
 
-            if (action === 'drop') {
-                const droppedItem = item.create({
-                    causesCollisions: false,
-                    width: GRID_SIZE,
-                    height: GRID_SIZE,
-                    x: player.x,
-                    y: player.y,
-                    itemType,
-                    count: itemCount,
-                });
+            const droppedItem = item.create({
+                causesCollisions: false,
+                width: GRID_SIZE,
+                height: GRID_SIZE,
+                x: player.x,
+                y: player.y,
+                itemType,
+                count: itemCount,
+            });
 
-                player.inventory[itemType] = 0;
+            player.inventory[itemType] = 0;
 
-                return droppedItem;
-            } else {
-                let loseItems = false;
+            return droppedItem;
+        };
 
-                switch (itemType) {
-                    case 'wood':
-                        if (interactWith === 'fire') {
-                            player.health += 10 * itemCount;
-                            loseItems = true;
-                        }
-                        break;
-                    case 'corpse':
-                        player.health += 1 * itemCount;
-                        break;
-                    default:
-                        console.error('that item type isn\'t handled');
-                        return;
-                }
+        player.useItem = (itemType) => {
+            const itemCount = player.inventory[itemType];
 
-                if (loseItems) {
-                    player.inventory[itemType] = 0;
-                }
+            let loseItems = false;
+
+            switch (itemType) {
+                case 'wood':
+                    if (interactWith.type === 'fire') {
+                        player.health += 10 * itemCount;
+                        loseItems = true;
+                    }
+                    break;
+                case 'corpse':
+                    player.health += 1 * itemCount;
+                    break;
+                case 'cauldron':
+                    interactWith.hasCauldron = true;
+                    loseItems = true;
+                    break;
+                default:
+                    console.error('that item type isn\'t handled');
+                    return false;
             }
+
+            if (loseItems) {
+                player.inventory[itemType] = 0;
+            }
+
+            return true;
         };
 
         player.craftItem = (itemType) => {
