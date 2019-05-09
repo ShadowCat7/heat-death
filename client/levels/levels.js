@@ -30,6 +30,12 @@ export default {
 
         player.draw(ctx, viewX, viewY, player);
 
+        // Array.prototype.sort mutates
+        entityList.sort((e1, e2) => {
+            if (e1.y === e2.y) return 0;
+            return e1.y > e2.y ? 1 : -1;
+        });
+
         for (let i = 0; i < entityList.length; i++) {
             entityList[i].draw(ctx, viewX, viewY, player);
         }
