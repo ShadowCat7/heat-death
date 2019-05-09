@@ -258,14 +258,26 @@ export default {
                     }
                     break;
                 case 'corpse':
-                    player.health += 1 * itemCount;
+                    player.health +=  itemCount;
                     break;
                 case 'cauldron':
-                    interactWith.hasCauldron = true;
-                    loseItems = true;
+                    if (interactWith.type === 'fire') {
+                        interactWith.hasCauldron = true;
+                        loseItems = true;
+                    }
+                    break;
+                case 'herb':
+                    if (interactWith.type === 'fire') {
+                        if (interactWith.hasCauldron) {
+                            player.inventory['potion'] = itemCount;
+                        } else {
+                            player.health += itemCount;
+                        }
+
+                        loseItems = true;
+                    }
                     break;
                 default:
-                    console.error('that item type isn\'t handled');
                     return false;
             }
 

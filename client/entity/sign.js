@@ -19,7 +19,7 @@ export default {
         options.talkable = true;
 
         options.getText = () => {
-            return options.data.text;
+            return options.text;
         };
 
         const sign = entityFactory.create(options);

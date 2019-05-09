@@ -1,6 +1,10 @@
 import entityFactory, { defaultDrawFunc } from '../entity/entity.js';
 import { drawInteractText } from '../utility/draw-utility.js';
 
+const INTERACT_TEXT = {
+    'herb': 'Pick herb',
+};
+
 export default {
     create: (options) => {
         options.width = options.width || 40;
@@ -24,7 +28,7 @@ export default {
             defaultDraw(ctx, viewX, viewY);
 
             if (entity.inInteractRange) {
-                drawInteractText(ctx, viewX, viewY, entity.itemType, entity);
+                drawInteractText(ctx, viewX, viewY, INTERACT_TEXT[entity.itemType], entity);
             }
         };
 

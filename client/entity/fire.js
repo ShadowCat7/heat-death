@@ -17,6 +17,8 @@ export default {
 
         options.color = 'red';
 
+        options.hasCauldron = false;
+
         const timer = createTimer(1);
 
         options.update = (entity, controls, entityList, elapsedTime, player) => {
@@ -33,8 +35,21 @@ export default {
         entity.draw = (ctx, viewX, viewY, player) => {
             defaultDraw(ctx, viewX, viewY);
 
+            if (entity.hasCauldron) {
+                ctx.fillStyle = '#2a2a2a';
+
+                ctx.fillRect(
+                    entity.x - viewX + 5,
+                    entity.y - viewY + 5,
+                    options.width - 10,
+                    options.height - 10
+                );
+            }
+
             if (entity.inInteractRange) {
-                drawInteractText(ctx, viewX, viewY, 'Fuel the fire', entity);
+                const text = entity.hasCauldron ? 'Fill the cauldron' : 'Fuel the fire';
+
+                drawInteractText(ctx, viewX, viewY, text, entity);
             }
         };
 

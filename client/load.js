@@ -4,11 +4,12 @@ import tree from './entity/tree.js';
 import person from './entity/person.js';
 import { moveRandom } from './entity/monsters/behaviors.js';
 import sign from './entity/sign.js';
+import item from './entity/item.js';
 
 export default (saveData) => {
     return saveData.map(e => {
         let genFunction = null;
-        const options = { data: e.data };
+        const options = { ...e.data };
 
         switch (e.type) {
             case 'tree':
@@ -26,6 +27,9 @@ export default (saveData) => {
                 break;
             case 'sign':
                 genFunction = sign.create;
+                break;
+            case 'item':
+                genFunction = item.create;
                 break;
             default:
                 console.error('This entity type does not exist (load.js).');
