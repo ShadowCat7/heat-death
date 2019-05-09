@@ -13,6 +13,7 @@ import stump from '../entity/stump.js';
 import createTimer from '../utility/timer.js';
 import { drawRect } from '../utility/draw-utility.js';
 import { CRAFTABLE_ITEMS } from './crafting.js';
+import notify from '../utility/notify.js';
 
 const MAX_SPEED = 300;
 const ATTACK_TIME_LIMIT = 0.3;
@@ -269,6 +270,7 @@ export default {
                 case 'herb':
                     if (interactWith.type === 'fire') {
                         if (interactWith.hasCauldron) {
+                            notify.alert(`You got ${itemCount} potions!`);
                             player.inventory['potion'] = itemCount;
                         } else {
                             player.health += itemCount;

@@ -13,7 +13,7 @@ import hud from './hud/hud.js';
 import './cheats.js';
 import levels from './levels/levels.js';
 import sign from './entity/sign.js';
-import alert from './utility/alert.js';
+import notify from './utility/notify.js';
 
 let sprites = null;
 
@@ -38,14 +38,16 @@ function draw(ctx) {
 
         hud.draw(ctx, player);
     }
-    
-    alert.draw(ctx);
+
+    notify.draw(ctx);
 }
 
 function update(controls, elapsedTime) {
     currentControls = controls;
 
-    if (alert.update(controls)) return;
+    if (notify.update(controls)) {
+        return;
+    }
 
     if (player.talkingTo) {
         speech.open(player.talkingTo.getText());
@@ -99,7 +101,7 @@ function update(controls, elapsedTime) {
                 if (actionSucceeded) {
                     isInventoryOpen = false;
                 } else {
-                    alert.alert('Nothing happens');
+                    notify.alert('Nothing happens');
                 }
             }
         });

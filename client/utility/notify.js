@@ -22,11 +22,13 @@ export default {
         }
     },
     update: (controls) => {
-        if (alertText && (
-            controls.interact && !controls.previousControls.interact ||
-            controls.escape && !controls.previousControls.escape)) {
+        if (alertText) {
+            if (controls.interact && !controls.previousControls.interact ||
+                controls.escape && !controls.previousControls.escape) {
 
-            alertText = null;
+                alertText = null;
+            }
+
             return true;
         }
 
