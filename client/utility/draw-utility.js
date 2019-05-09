@@ -12,15 +12,15 @@ export const drawLine = (ctx, startX, startY, endX, endY, color) => {
 };
 
 const DEFAULT_FONT = '30px Arial';
-const DEFAULT_COLOR = '#e0e0e0';
+export const DEFAULT_TEXT_COLOR = '#e0e0e0';
 const DEFAULT_TEXT_ALIGN = 'left';
 const DEFAULT_TEXT_BASELINE = 'top';
-const DEFAULT_LINE_HEIGHT = 30;
+export const DEFAULT_LINE_HEIGHT = 30;
 export const DEFAULT_PADDING = 10;
 export const drawText = (ctx, text, x, y, options = {}) => {
     const {
         font = DEFAULT_FONT,
-        textColor = DEFAULT_COLOR,
+        textColor = DEFAULT_TEXT_COLOR,
         textAlign = DEFAULT_TEXT_ALIGN,
         textBaseline = DEFAULT_TEXT_BASELINE,
         lineHeight = DEFAULT_LINE_HEIGHT,
@@ -42,7 +42,7 @@ export const drawText = (ctx, text, x, y, options = {}) => {
 };
 
 export const DEFAULT_BORDER_COLOR = '#e0e0e0';
-const DEFAULT_BORDER_WIDTH = 5;
+export const DEFAULT_BORDER_WIDTH = 5;
 const DEFAULT_BACKGROUND_COLOR = '#000';
 export const drawBorder = (ctx, options = {}) => {
     const {

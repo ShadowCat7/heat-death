@@ -1,23 +1,29 @@
 import { VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
-import { DEFAULT_PADDING, drawBorderedText, drawText } from './draw-utility.js';
+import {
+    DEFAULT_BORDER_WIDTH,
+    DEFAULT_LINE_HEIGHT,
+    DEFAULT_PADDING,
+    DEFAULT_TEXT_COLOR,
+    drawBorderedText,
+    drawText,
+} from './draw-utility.js';
 
 const V_PADDING = 10;
 const H_PADDING = 10;
 const CURSOR_WIDTH = 30;
-const H_TEXT_PADDING = H_PADDING + CURSOR_WIDTH + H_PADDING;
-const LINE_HEIGHT = 30;
-const STARTING_LINE = V_PADDING + V_PADDING + LINE_HEIGHT;
-
-const LINE_COUNT = Math.floor((VIEW_HEIGHT - STARTING_LINE) / (LINE_HEIGHT + V_PADDING));
+const H_TEXT_PADDING = DEFAULT_PADDING * 2 + CURSOR_WIDTH;
+const STARTING_LINE = DEFAULT_PADDING * 2 + DEFAULT_LINE_HEIGHT;
+const LINE_COUNT = Math.floor((VIEW_HEIGHT - STARTING_LINE) / (DEFAULT_LINE_HEIGHT + DEFAULT_PADDING));
 
 const ACTION_MENU_BORDER = 5;
 const ACTION_MENU_WIDTH = 200;
-const ACTION_MENU_TOTAL_WIDTH = ACTION_MENU_WIDTH + ACTION_MENU_BORDER * 2 + H_TEXT_PADDING + H_PADDING;
-const ACTION_MENU_INTERIOR_WIDTH = ACTION_MENU_TOTAL_WIDTH - ACTION_MENU_BORDER * 2;
-const ACTION_MENU_X = VIEW_WIDTH - ACTION_MENU_INTERIOR_WIDTH - ACTION_MENU_BORDER;
+const ACTION_MENU_TOTAL_WIDTH = ACTION_MENU_WIDTH + DEFAULT_BORDER_WIDTH * 2 + H_TEXT_PADDING + DEFAULT_PADDING;
+const ACTION_MENU_X = VIEW_WIDTH - ACTION_MENU_TOTAL_WIDTH;
+
+const DISABLED_TEXT_COLOR = '#777';
 
 const ALERT_WIDTH = 400;
-const ALERT_HEIGHT = ACTION_MENU_BORDER * 2 + V_PADDING * 2 + LINE_HEIGHT;
+const ALERT_HEIGHT = ACTION_MENU_BORDER * 2 + V_PADDING * 2 + DEFAULT_LINE_HEIGHT;
 const ALERT_X = VIEW_WIDTH / 2 - ALERT_WIDTH / 2;
 const ALERT_Y = VIEW_HEIGHT / 2 - ALERT_HEIGHT / 2;
 
@@ -49,26 +55,32 @@ export default({
             drawText(ctx, titleText, VIEW_WIDTH / 2, V_PADDING, { textAlign: 'center' });
 
             const itemLabels = items.map(item => item.label);
-            drawText(ctx, itemLabels.slice(0, LINE_COUNT), H_TEXT_PADDING, V_PADDING * 2 + LINE_HEIGHT);
-            drawText(ctx, itemLabels.slice(LINE_COUNT, LINE_COUNT * 2), H_TEXT_PADDING + VIEW_WIDTH / 2, V_PADDING * 2 + LINE_HEIGHT);
+            drawText(ctx, itemLabels.slice(0, LINE_COUNT), H_TEXT_PADDING, STARTING_LINE);
+            drawText(ctx, itemLabels.slice(LINE_COUNT, LINE_COUNT * 2), H_TEXT_PADDING + VIEW_WIDTH / 2, STARTING_LINE);
 
             if (cursorShown) {
                 if (isActionsOpen) {
                     const item = items[cursorPosition];
                     const actions = item.actions;
-                    const height = (actions.length + 1) * (LINE_HEIGHT + V_PADDING) + V_PADDING * 2;
+                    const height = (actions.length + 1) * (DEFAULT_LINE_HEIGHT + V_PADDING) + V_PADDING * 2;
+                    const actionMenuY = VIEW_HEIGHT - height;
 
-                    drawBorderedText(ctx, actions.concat([CANCEL_TEXT]), {
+                    drawBorderedText(ctx, actions.concat([]), {
                         x: VIEW_WIDTH - ACTION_MENU_TOTAL_WIDTH,
-                        y: VIEW_HEIGHT - height,
+                        y: actionMenuY,
                         width: ACTION_MENU_TOTAL_WIDTH,
                         height,
-                        horizontalPadding: DEFAULT_PADDING * 2 + CURSOR_WIDTH,
+                        horizontalPadding: H_TEXT_PADDING,
+                        textColor: item.disabled ? DISABLED_TEXT_COLOR : DEFAULT_TEXT_COLOR,
                     });
 
-                    const actionMenuY = VIEW_HEIGHT - height + ACTION_MENU_BORDER;
+                    drawText(ctx, CANCEL_TEXT,
+                        ACTION_MENU_X + DEFAULT_BORDER_WIDTH + H_TEXT_PADDING,
+                        VIEW_HEIGHT - (DEFAULT_PADDING + DEFAULT_LINE_HEIGHT + DEFAULT_BORDER_WIDTH)
+                    );
+
                     const cursorX = ACTION_MENU_X + H_PADDING;
-                    const cursorY = actionMenuY + V_PADDING + (V_PADDING + LINE_HEIGHT) * cursorActionPosition;
+                    const cursorY = actionMenuY + V_PADDING + (V_PADDING + DEFAULT_LINE_HEIGHT) * cursorActionPosition;
                     ctx.drawImage(cursorImage, cursorX, cursorY);
                 }
 
@@ -80,7 +92,7 @@ export default({
                     xPosition += VIEW_WIDTH / 2;
                 }
 
-                ctx.drawImage(cursorImage, xPosition, V_PADDING + (V_PADDING + LINE_HEIGHT) * (yPosition + 1) - 2);
+                ctx.drawImage(cursorImage, xPosition, V_PADDING + (V_PADDING + DEFAULT_LINE_HEIGHT) * (yPosition + 1) - 2);
             }
 
             if (alertText) {
