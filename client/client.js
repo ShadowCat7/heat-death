@@ -1,9 +1,6 @@
 import playerFactory from './player/player.js';
 import monsterFactory from './entity/monsters/monster.js';
-import { snapToGrid } from './utility/physics.js';
-import { GRID_SIZE, HP_BAR_HEIGHT, VIEW_HEIGHT, VIEW_WIDTH } from './constants.js';
-import monster from './entity/monsters/monster.js';
-import { chasePlayer, chasePlayerIfClose, moveRandom, standStill } from './entity/monsters/behaviors.js';
+import { chasePlayerIfClose } from './entity/monsters/behaviors.js';
 import inventoryMenu from './player/inventory.js';
 import craftingMenu from './player/crafting.js';
 import speech from './player/speech.js';
@@ -16,6 +13,7 @@ import hud from './hud/hud.js';
 import './cheats.js';
 import levels from './levels/levels.js';
 import sign from './entity/sign.js';
+import alert from './utility/alert.js';
 
 let sprites = null;
 
@@ -40,10 +38,14 @@ function draw(ctx) {
 
         hud.draw(ctx, player);
     }
+    
+    alert.draw(ctx);
 }
 
 function update(controls, elapsedTime) {
     currentControls = controls;
+
+    if (alert.update(controls)) return;
 
     if (player.talkingTo) {
         speech.open(player.talkingTo.getText());
@@ -97,7 +99,7 @@ function update(controls, elapsedTime) {
                 if (actionSucceeded) {
                     isInventoryOpen = false;
                 } else {
-                    inventoryMenu.alert('Nothing happens');
+                    alert.alert('Nothing happens');
                 }
             }
         });

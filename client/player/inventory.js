@@ -1,10 +1,5 @@
 import createMenu from '../utility/menu.js';
 
-export const INVENTORY_ITEMS = [
-    'wood',
-    'corpse',
-];
-
 let inventoryMenu = null;
 
 const getInventory = (inventory) => {
@@ -28,9 +23,6 @@ const getInventory = (inventory) => {
 };
 
 export default {
-    alert: (alertText) => {
-        inventoryMenu.alert(alertText);
-    },
     changeTitle: (title) => {
         inventoryMenu.changeTitle(title);
     },
