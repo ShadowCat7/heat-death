@@ -28,11 +28,11 @@ export default {
         let viewX = player.x - VIEW_WIDTH / 2 + player.rect.width / 2;
         let viewY = player.y - VIEW_HEIGHT / 2 + player.rect.height / 2;
 
+        player.draw(ctx, viewX, viewY, player);
+
         for (let i = 0; i < entityList.length; i++) {
             entityList[i].draw(ctx, viewX, viewY, player);
         }
-
-        player.draw(ctx, viewX, viewY, player);
     },
     drawMap: (ctx, player) => {
         map.draw(ctx, player, entityList);
