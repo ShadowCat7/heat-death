@@ -1,5 +1,6 @@
 import createTimer from '../utility/timer.js';
 import { VIEW_WIDTH, HP_BAR_HEIGHT } from '../constants.js';
+import { drawText } from '../utility/draw-utility.js';
 
 const V_PADDING = 10;
 const H_PADDING = 10;
@@ -25,12 +26,7 @@ export default {
             minutes = '0' + minutes;
         }
 
-        ctx.font = '30px Arial';
-        ctx.fillStyle = '#e0e0e0';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-
-        ctx.fillText(`${hours}:${minutes}`, TEXT_X, TEXT_Y);
+        drawText(ctx, `${hours}:${minutes}`, TEXT_X, TEXT_Y);
     },
     update: (elapsedTime) => {
         if (clockTimer.update(elapsedTime)) {

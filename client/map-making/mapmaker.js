@@ -8,7 +8,7 @@ import tree from '../entity/tree.js';
 import clickableFactory from './click-element.js';
 
 import { loadGame, startGame } from '../utility/game.js';
-import { drawLine, drawRect } from '../utility/draw-utility.js';
+import { drawLine, drawRect, drawText } from '../utility/draw-utility.js';
 import uiControls from './ui-controls.js';
 import person from '../entity/person.js';
 import sign from '../entity/sign.js';
@@ -87,13 +87,15 @@ function draw(ctx) {
             clickElements[i].draw(ctx);
         }
 
-        ctx.font = '12px Arial';
-        ctx.fillStyle = '#000';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'bottom';
         const x = Math.floor((mouseX + cameraX) / GRID_SIZE) * GRID_SIZE;
         const y = Math.floor((mouseY + cameraY) / GRID_SIZE) * GRID_SIZE;
-        ctx.fillText(`${x}, ${y}`, 5, VIEW_HEIGHT);
+
+        drawText(ctx, `${x}, ${y}`, 5, VIEW_HEIGHT, {
+            font: '12px Arial',
+            textColor: '#000',
+            textAlign: 'left',
+            textBaseline: 'bottom',
+        });
     }
 }
 

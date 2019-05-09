@@ -1,5 +1,5 @@
 import { VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
-import { drawRect } from './draw-utility.js';
+import { DEFAULT_PADDING, drawBorderedText, drawText } from './draw-utility.js';
 
 const V_PADDING = 10;
 const H_PADDING = 10;
@@ -9,11 +9,6 @@ const LINE_HEIGHT = 30;
 const STARTING_LINE = V_PADDING + V_PADDING + LINE_HEIGHT;
 
 const LINE_COUNT = Math.floor((VIEW_HEIGHT - STARTING_LINE) / (LINE_HEIGHT + V_PADDING));
-
-const BORDER_COLOR = '#e0e0e0';
-const TEXT_COLOR = '#e0e0e0';
-const DISABLED_TEXT_COLOR = '#777';
-const BACKGROUND_COLOR = '#000';
 
 const ACTION_MENU_BORDER = 5;
 const ACTION_MENU_WIDTH = 200;
@@ -38,7 +33,7 @@ export default({
     let cursorShown = false;
     let isActionsOpen = false;
     let alertText = null;
-    let titleText = null;
+    let titleText = title;
 
     return {
         alert: (text) => {
@@ -51,25 +46,11 @@ export default({
             items = newItems;
         },
         draw: (ctx) => {
-            ctx.font = '30px Arial';
-            ctx.fillStyle = TEXT_COLOR;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.fillText(titleText, VIEW_WIDTH / 2, V_PADDING);
+            drawText(ctx, titleText, VIEW_WIDTH / 2, V_PADDING, { textAlign: 'center' });
 
-            items.forEach((item, i) => {
-                ctx.font = '30px Arial';
-                ctx.fillStyle = TEXT_COLOR;
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
-
-                let indexPosition = i;
-                if (i >= LINE_COUNT) indexPosition -= LINE_COUNT;
-
-                const hPosition = H_TEXT_PADDING + (i >= LINE_COUNT ? VIEW_WIDTH / 2 : 0);
-
-                ctx.fillText(item.label, hPosition, V_PADDING + (V_PADDING + LINE_HEIGHT) * (indexPosition + 1));
-            });
+            const itemLabels = items.map(item => item.label);
+            drawText(ctx, itemLabels.slice(0, LINE_COUNT), H_TEXT_PADDING, V_PADDING * 2 + LINE_HEIGHT);
+            drawText(ctx, itemLabels.slice(LINE_COUNT, LINE_COUNT * 2), H_TEXT_PADDING + VIEW_WIDTH / 2, V_PADDING * 2 + LINE_HEIGHT);
 
             if (cursorShown) {
                 if (isActionsOpen) {
@@ -77,47 +58,15 @@ export default({
                     const actions = item.actions;
                     const height = (actions.length + 1) * (LINE_HEIGHT + V_PADDING) + V_PADDING * 2;
 
-                    // border
-                    drawRect(ctx, {
+                    drawBorderedText(ctx, actions.concat([CANCEL_TEXT]), {
+                        x: VIEW_WIDTH - ACTION_MENU_TOTAL_WIDTH,
+                        y: VIEW_HEIGHT - height,
                         width: ACTION_MENU_TOTAL_WIDTH,
                         height,
-                    }, VIEW_WIDTH - ACTION_MENU_TOTAL_WIDTH, VIEW_HEIGHT - height, BORDER_COLOR);
-
-                    const actionMenuY = VIEW_HEIGHT - height + ACTION_MENU_BORDER;
-
-                    // inside
-                    drawRect(ctx, {
-                        width: ACTION_MENU_INTERIOR_WIDTH,
-                        height: height - ACTION_MENU_BORDER * 2,
-                    }, ACTION_MENU_X,
-                        actionMenuY,
-                        BACKGROUND_COLOR,
-                    );
-
-                    const textColor = item.disabled ? DISABLED_TEXT_COLOR : TEXT_COLOR;
-
-                    let i = 0;
-                    actions.forEach((action) => {
-                        ctx.font = '30px Arial';
-                        ctx.fillStyle = textColor;
-                        ctx.textAlign = 'left';
-                        ctx.textBaseline = 'top';
-
-                        const vPosition = actionMenuY + V_PADDING + (V_PADDING + LINE_HEIGHT) * i;
-
-                        ctx.fillText(action, ACTION_MENU_X + H_TEXT_PADDING, vPosition);
-                        i++;
+                        horizontalPadding: DEFAULT_PADDING * 2 + CURSOR_WIDTH,
                     });
 
-                    ctx.font = '30px Arial';
-                    ctx.fillStyle = TEXT_COLOR;
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-
-                    const vPosition = actionMenuY + V_PADDING + (V_PADDING + LINE_HEIGHT) * i;
-
-                    ctx.fillText(CANCEL_TEXT, ACTION_MENU_X + H_TEXT_PADDING, vPosition);
-
+                    const actionMenuY = VIEW_HEIGHT - height + ACTION_MENU_BORDER;
                     const cursorX = ACTION_MENU_X + H_PADDING;
                     const cursorY = actionMenuY + V_PADDING + (V_PADDING + LINE_HEIGHT) * cursorActionPosition;
                     ctx.drawImage(cursorImage, cursorX, cursorY);
@@ -135,28 +84,11 @@ export default({
             }
 
             if (alertText) {
-                drawRect(ctx, {
+                drawBorderedText(ctx, alertText, {
+                    x: ALERT_X,
+                    y: ALERT_Y,
                     width: ALERT_WIDTH,
-                    height: ALERT_HEIGHT,
-                }, ALERT_X,
-                    ALERT_Y,
-                    BORDER_COLOR,
-                );
-
-                drawRect(ctx, {
-                    width: ALERT_WIDTH - ACTION_MENU_BORDER * 2,
-                    height: ALERT_HEIGHT - ACTION_MENU_BORDER * 2,
-                }, ALERT_X + ACTION_MENU_BORDER,
-                    ALERT_Y + ACTION_MENU_BORDER,
-                    BACKGROUND_COLOR,
-                );
-
-                ctx.font = '30px Arial';
-                ctx.fillStyle = TEXT_COLOR;
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
-
-                ctx.fillText(alertText, ALERT_X + ACTION_MENU_BORDER + H_PADDING, ALERT_Y + ACTION_MENU_BORDER + V_PADDING);
+                });
             }
         },
         update: (showCursor, controls, chooseCallback) => {
@@ -188,7 +120,9 @@ export default({
                 }
 
                 if (controls.escape && !controls.previousControls.escape) {
-                    if (isActionsOpen) {
+                    if (alertText) {
+                        alertText = null;
+                    } else if (isActionsOpen) {
                         isActionsOpen = false;
                     } else {
                         chooseCallback(null);

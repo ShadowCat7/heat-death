@@ -1,4 +1,5 @@
 import { isInsideRect } from '../utility/physics.js';
+import { drawText } from '../utility/draw-utility.js';
 
 const createClickElement = ({
     x,
@@ -54,11 +55,12 @@ const createClickElement = ({
         entity.draw(ctx, 0, 0, player);
 
         if (hover) {
-            ctx.font = '22px Arial';
-            ctx.fillStyle = '#000';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(entity.type, x + entity.rect.width / 2, y + entity.rect.width / 2);
+            drawText(ctx, entity.type, x + entity.rect.width / 2, y + entity.rect.width / 2, {
+                font: '22px Arial',
+                textColor: '#000',
+                textAlign: 'center',
+                textBaseline: 'middle',
+            });
         }
 
         if (selected) {

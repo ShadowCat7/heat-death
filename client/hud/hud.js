@@ -1,5 +1,6 @@
 import clock from './clock.js';
 import { HP_BAR_HEIGHT, VIEW_WIDTH } from '../constants.js';
+import { drawText } from '../utility/draw-utility.js';
 
 export default {
     draw: (ctx, player) => {
@@ -10,11 +11,10 @@ export default {
         ctx.fillStyle = 'green';
         ctx.fillRect(3, 3, player.health / 1000 * (VIEW_WIDTH - 6), 15);
 
-        ctx.font = '12px Arial';
-        ctx.fillStyle = '#eee';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(`${player.health}/1000`, VIEW_WIDTH / 2, 6);
+        drawText(ctx, `${player.health}/1000`, VIEW_WIDTH / 2, 6, {
+            font: '12px Arial',
+            textAlign: 'center',
+        });
 
         clock.draw(ctx);
     },
