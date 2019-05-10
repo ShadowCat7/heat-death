@@ -18,6 +18,8 @@ export default {
         options.interactive = true;
         options.talkable = true;
 
+        options.color = '#af7e50';
+
         options.getText = () => {
             return options.text;
         };
