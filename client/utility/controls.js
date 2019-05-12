@@ -13,6 +13,7 @@ const controlMap = {
     'KeyP': 'save',
     'Period': 'load',
     'KeyO': 'storeData',
+    'KeyQ': 'questLog',
 };
 
 const friendlyKeyMap = {
@@ -30,6 +31,7 @@ const friendlyKeyMap = {
     'KeyP': 'P',
     'Period': 'Period',
     'KeyO': 'O',
+    'KeyQ': 'Q',
 };
 
 export const controlsToString = () => {

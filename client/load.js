@@ -5,6 +5,7 @@ import person from './entity/person.js';
 import { moveRandom } from './entity/monsters/behaviors.js';
 import sign from './entity/sign.js';
 import item from './entity/item.js';
+import bulletin from './entity/bulletin.js';
 
 export default (saveData) => {
     return saveData.map(e => {
@@ -30,6 +31,9 @@ export default (saveData) => {
                 break;
             case 'item':
                 genFunction = item.create;
+                break;
+            case 'bulletin':
+                genFunction = bulletin.create;
                 break;
             default:
                 console.error('This entity type does not exist (load.js).');

@@ -66,6 +66,7 @@ export default {
         options.inventory = {
             metal: 10,
         };
+        options.quests = [];
         options.health = 100;
 
         let direction = null;
@@ -201,6 +202,8 @@ export default {
                         });
                     } else if (entity.talkable) {
                         player.talkingTo = entity;
+                    } else if (entity.type === 'bulletin') {
+                        player.checkBulletin = true;
                     }
                 }
             }

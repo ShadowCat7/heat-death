@@ -14,6 +14,8 @@ import './cheats.js';
 import levels from './levels/levels.js';
 import sign from './entity/sign.js';
 import notify from './utility/notify.js';
+import bulletinMenu from './player/bulletin-board.js';
+import bulletin from './entity/bulletin.js';
 
 let sprites = null;
 
@@ -23,9 +25,14 @@ let currentControls = {};
 
 let isInventoryOpen = false;
 let isCraftingOpen = false;
+let isBulletinOpen = false;
+
+const possibleQuests = [0];
 
 function draw(ctx) {
-    if (isInventoryOpen) {
+    if (isBulletinOpen) {
+        bulletinMenu.draw(ctx);
+    } else if (isInventoryOpen) {
         inventoryMenu.draw(ctx);
     } else if (isCraftingOpen) {
         craftingMenu.draw(ctx);
@@ -59,9 +66,23 @@ function update(controls, elapsedTime) {
         return;
     }
 
+    if (player.checkBulletin) {
+        player.checkBulletin = false;
+        bulletinMenu.updateMenuItems(possibleQuests, true);
+        isBulletinOpen = true;
+    }
+
+    if (controls.questLog && !controls.previousControls.questLog) {
+        bulletinMenu.updateMenuItems(player.quests, false);
+        isBulletinOpen = !isBulletinOpen;
+        isInventoryOpen = false;
+        isCraftingOpen = false;
+    }
+
     if (controls.inventory && !controls.previousControls.inventory) {
         isInventoryOpen = !isInventoryOpen;
         isCraftingOpen = false;
+        isBulletinOpen = false;
 
         inventoryMenu.changeTitle('Inventory');
         inventoryMenu.updateMenuItems(player.inventory);
@@ -70,6 +91,7 @@ function update(controls, elapsedTime) {
     if (player.addItemMenu) {
         isInventoryOpen = true;
         isCraftingOpen = false;
+        isBulletinOpen = false;
 
         inventoryMenu.changeTitle('Use Item');
         inventoryMenu.updateMenuItems(player.inventory);
@@ -78,6 +100,7 @@ function update(controls, elapsedTime) {
     if (controls.crafting  && !controls.previousControls.crafting) {
         isCraftingOpen = !isCraftingOpen;
         isInventoryOpen = false;
+        isBulletinOpen = false;
 
         craftingMenu.updateMenuItems(player.inventory);
     }
@@ -115,6 +138,15 @@ function update(controls, elapsedTime) {
                 craftingMenu.updateMenuItems(player.inventory);
             }
         });
+    } else if (isBulletinOpen) {
+        bulletinMenu.update(true, controls, (questId) => {
+            if (questId !== null) {
+                player.quests.push(questId);
+                possibleQuests.splice(questId, 1);
+            }
+
+            isBulletinOpen = false;
+        });
     } else if (!controls.map) {
         hud.update(elapsedTime);
 
@@ -129,9 +161,12 @@ loadGame((images) => {
 
     craftingMenu.initialize(sprites);
 
+    bulletinMenu.initialize(sprites);
+
     speech.initialize(sprites);
 
     sign.initialize(sprites);
+    bulletin.initialize(sprites);
 
     /*
     const monster = monsterFactory.create({
