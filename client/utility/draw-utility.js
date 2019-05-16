@@ -1,3 +1,5 @@
+import { VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
+
 export const drawRect = (ctx, rect, x, y, color) => {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, rect.width, rect.height);
@@ -11,6 +13,20 @@ export const drawLine = (ctx, startX, startY, endX, endY, color) => {
     ctx.stroke();
 };
 
+const setupTextContext = (ctx, options = {}) => {
+    const {
+        font = DEFAULT_FONT,
+        textColor = DEFAULT_TEXT_COLOR,
+        textAlign = DEFAULT_TEXT_ALIGN,
+        textBaseline = DEFAULT_TEXT_BASELINE,
+    } = options;
+
+    ctx.font = font;
+    ctx.fillStyle = textColor;
+    ctx.textAlign = textAlign;
+    ctx.textBaseline = textBaseline;
+};
+
 const DEFAULT_FONT = '30px Arial';
 export const DEFAULT_TEXT_COLOR = '#e0e0e0';
 const DEFAULT_TEXT_ALIGN = 'left';
@@ -19,18 +35,11 @@ export const DEFAULT_LINE_HEIGHT = 30;
 export const DEFAULT_PADDING = 10;
 export const drawText = (ctx, text, x, y, options = {}) => {
     const {
-        font = DEFAULT_FONT,
-        textColor = DEFAULT_TEXT_COLOR,
-        textAlign = DEFAULT_TEXT_ALIGN,
-        textBaseline = DEFAULT_TEXT_BASELINE,
         lineHeight = DEFAULT_LINE_HEIGHT,
         verticalPadding = DEFAULT_PADDING,
     } = options;
 
-    ctx.font = font;
-    ctx.fillStyle = textColor;
-    ctx.textAlign = textAlign;
-    ctx.textBaseline = textBaseline;
+    setupTextContext(ctx, options);
 
     if (typeof text === 'string') {
         ctx.fillText(text, x, y);
@@ -53,37 +62,95 @@ export const drawBorder = (ctx, options = {}) => {
         borderColor = DEFAULT_BORDER_COLOR,
         borderWidth = DEFAULT_BORDER_WIDTH,
         backgroundColor = DEFAULT_BACKGROUND_COLOR,
-        textLineCount,
+    } = options;
+
+    ctx.fillStyle = borderColor;
+    ctx.fillRect(x, y, width, height);
+
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(x + borderWidth, y + borderWidth, width - borderWidth * 2, height - borderWidth * 2);
+};
+
+const getTextWidth = (ctx, text, options) => {
+    const {
+        borderWidth = DEFAULT_BORDER_WIDTH,
+        horizontalPadding = DEFAULT_PADDING,
+    } = options;
+
+    let calculatedWidth = 0;
+
+    setupTextContext(ctx, options);
+
+    if ((typeof text) === 'string') {
+        calculatedWidth = ctx.measureText(text).width;
+    } else {
+        for (let i = 0; i < text.length; i++) {
+            calculatedWidth = Math.max(calculatedWidth, ctx.measureText(text[i]).width)
+        }
+    }
+
+    calculatedWidth += horizontalPadding * 2 + borderWidth * 2;
+
+    return calculatedWidth;
+};
+
+export const getDimensions = (ctx, text, options) => {
+    const {
+        borderWidth = DEFAULT_BORDER_WIDTH,
+        lineHeight = DEFAULT_LINE_HEIGHT,
+        verticalPadding = DEFAULT_PADDING,
+        isBoxCentered = false,
+    } = options;
+
+    let { x, y } = options;
+
+    const textLineCount = (typeof text) === 'string' ? 1 : text.length;
+
+    const width = getTextWidth(ctx, text, options);
+    const height = borderWidth * 2 + verticalPadding + textLineCount * (lineHeight + verticalPadding);
+
+    if (isBoxCentered) {
+        x = VIEW_WIDTH / 2 - width / 2;
+        y = VIEW_HEIGHT / 2 - height / 2;
+    }
+
+    return {
+        width,
+        height,
+        x,
+        y,
+    };
+};
+
+export const drawBorderedText = (ctx, text, options = {}) => {
+    const {
+        width,
+        height,
+        borderWidth = DEFAULT_BORDER_WIDTH,
+        horizontalPadding = DEFAULT_PADDING,
         lineHeight = DEFAULT_LINE_HEIGHT,
         verticalPadding = DEFAULT_PADDING,
     } = options;
+
+     if (!width) {
+        options.width = getTextWidth(ctx, text, options);
+    }
 
     let calculatedHeight = height;
     if (!height) {
         calculatedHeight = borderWidth * 2 + verticalPadding + textLineCount * (lineHeight + verticalPadding);
     }
+    options.height = calculatedHeight;
 
-    ctx.fillStyle = borderColor;
-    ctx.fillRect(x, y, width, calculatedHeight);
+    drawBorder(ctx,  options);
 
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(x + borderWidth, y + borderWidth, width - borderWidth * 2, calculatedHeight - borderWidth * 2);
-};
-
-export const drawBorderedText = (ctx, text, options = {}) => {
-    const {
-        x,
-        y,
-        borderWidth = DEFAULT_BORDER_WIDTH,
-        horizontalPadding = DEFAULT_PADDING,
-        verticalPadding = DEFAULT_PADDING,
-    } = options;
-
-    drawBorder(ctx,  {
-        textLineCount: (typeof text) === 'string' ? 1 : text.length,
-        ...options
-    });
-    drawText(ctx, text, x + borderWidth + horizontalPadding, y + borderWidth + verticalPadding, options);
+    drawText(
+        ctx,
+        text,
+        options.x + borderWidth + horizontalPadding,
+        options.y + borderWidth + verticalPadding,
+        options
+    );
 };
 
 export const drawInteractText = (ctx, viewX, viewY, action, entity) => {
