@@ -2,20 +2,24 @@ import createMenu from '../utility/menu.js';
 
 let inventoryMenu = null;
 
-const getInventory = (inventory) => {
+const getInventory = (inventory, entityInRange) => {
     const inventoryItems = [];
 
     for (let itemType in inventory) {
         const itemCount = inventory[itemType];
 
+        const actions = ['use'];
+        if (entityInRange) {
+            actions.push('give');
+        }
+
+        actions.push('drop');
+
         inventoryItems.push({
             label: `${itemType}: ${itemCount}`,
             id: itemType,
             disabled: itemCount === 0,
-            actions: [
-                'use',
-                'drop',
-            ],
+            actions,
         });
     }
 
@@ -33,8 +37,8 @@ export default {
             cursorImage: sprites['arrow'],
         });
     },
-    updateMenuItems: (inventory) => {
-        inventoryMenu.changeItems(getInventory(inventory));
+    updateMenuItems: (inventory, entityInRange) => {
+        inventoryMenu.changeItems(getInventory(inventory, entityInRange));
     },
     update: (showCursor, controls, chooseCallback) => {
         inventoryMenu.update(showCursor, controls, chooseCallback);

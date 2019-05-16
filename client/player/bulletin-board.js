@@ -1,9 +1,15 @@
 import createMenu from '../utility/menu.js';
 
-const QUESTS = [{
+export const QUESTS = [{
     name: 'Quest 0',
-}, {
-
+    goal: {
+        personId: 'person id',
+        item: 'wood',
+        itemCount: 5,
+    },
+    reward: {
+        'metal': 10,
+    },
 }];
 
 let bulletinMenu = null;

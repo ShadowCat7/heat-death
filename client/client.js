@@ -85,7 +85,7 @@ function update(controls, elapsedTime) {
         isBulletinOpen = false;
 
         inventoryMenu.changeTitle('Inventory');
-        inventoryMenu.updateMenuItems(player.inventory);
+        inventoryMenu.updateMenuItems(player.inventory, player.entityInRange && player.entityInRange.type === 'person');
     }
 
     if (player.addItemMenu) {
@@ -118,6 +118,11 @@ function update(controls, elapsedTime) {
                 }
 
                 isInventoryOpen = false;
+            } else if (action === 'give') {
+                if (player.giveItem(itemType)) {
+                    console.log('close?');
+                    isInventoryOpen = false;
+                }
             } else {
                 const actionSucceeded = player.useItem(itemType);
 

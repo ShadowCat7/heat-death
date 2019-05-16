@@ -20,6 +20,7 @@ export default {
         options.color = 'purple';
         options.interactive = true;
         options.talkable = true;
+        options.personId = 'person id';
 
         options.getText = () => {
             return ['Do you like my place?'];

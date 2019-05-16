@@ -14,6 +14,7 @@ import createTimer from '../utility/timer.js';
 import { drawRect } from '../utility/draw-utility.js';
 import { CRAFTABLE_ITEMS } from './crafting.js';
 import notify from '../utility/notify.js';
+import { QUESTS } from './bulletin-board.js';
 
 const MAX_SPEED = 300;
 const ATTACK_TIME_LIMIT = 0.3;
@@ -74,6 +75,8 @@ export default {
         let interactWith = null;
 
         options.update = (player, controls, entityList, elapsedTime) => {
+            player.entityInRange = null;
+
             let newX = player.x;
             let newY = player.y;
 
@@ -172,11 +175,10 @@ export default {
             }
 
             if (closestItemIndex !== null) {
-                entityList[closestItemIndex].inInteractRange = true;
+                const entity = entityList[closestItemIndex];
+                entity.inInteractRange = true;
 
                 if (controls.interact && !controls.previousControls.interact) {
-                    const entity = entityList[closestItemIndex];
-
                     if (entity.type === 'item') {
                         const itemType = entity.itemType;
 
@@ -205,6 +207,8 @@ export default {
                     } else if (entity.type === 'bulletin') {
                         player.checkBulletin = true;
                     }
+                } else {
+                    player.entityInRange = entity;
                 }
             }
 
@@ -305,6 +309,50 @@ export default {
             for (let itemName in item.cost) {
                 player.inventory[itemName] -= item.cost[itemName];
             }
+        };
+
+        player.giveItem = (itemType) => {
+            const givingTo = player.entityInRange;
+
+            console.log(player.quests);
+            const finishQuestId = player.quests.find(questId => {
+                const quest = QUESTS[questId];
+
+                return quest.goal.personId === givingTo.personId
+                    && quest.goal.item === itemType &&
+                    player.inventory[itemType] >= quest.goal.itemCount;
+            });
+
+            const finishQuest = QUESTS[finishQuestId];
+
+            if (finishQuest) {
+                const rewardText = [];
+
+                player.inventory[finishQuest.goal.item] -= finishQuest.goal.itemCount;
+
+                for (let itemName in finishQuest.reward) {
+                    rewardText.push(`  +${finishQuest.reward[itemName]} ${itemName}`);
+
+                    if (!player.inventory[itemName]) {
+                        player.inventory[itemName] = finishQuest.reward[itemName];
+                    } else {
+                        player.inventory[itemName] += finishQuest.reward[itemName];
+                    }
+                }
+
+                notify.alert([
+                    'You finished the quest!',
+                    'You get:',
+                ].concat(rewardText));
+
+                player.quests.splice(player.quests.indexOf(finishQuest), 1);
+
+                return true;
+            }
+
+            notify.alert(['That doesn\'t do anything.']);
+
+            return false;
         };
 
         return player;
