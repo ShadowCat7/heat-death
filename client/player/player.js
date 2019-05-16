@@ -314,7 +314,6 @@ export default {
         player.giveItem = (itemType) => {
             const givingTo = player.entityInRange;
 
-            console.log(player.quests);
             const finishQuestId = player.quests.find(questId => {
                 const quest = QUESTS[questId];
 

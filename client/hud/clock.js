@@ -9,7 +9,7 @@ const TEXT_Y = V_PADDING + HP_BAR_HEIGHT;
 
 // 60 min in an hour, * 24 hours
 const MINUTES_IN_HOUR = 60;
-const MAX_TIME = MINUTES_IN_HOUR * 24;
+export const DAY_DURATION = MINUTES_IN_HOUR * 24;
 
 let clock = 1435;
 const clockTimer = createTimer(1);
@@ -32,14 +32,14 @@ export default {
         if (clockTimer.update(elapsedTime)) {
             clock += 1;
 
-            if (clock >= MAX_TIME) clock = 0;
+            if (clock >= DAY_DURATION) clock = 0;
         }
     },
     getTime: () => {
         return clock;
     },
     setTime: (time) => {
-        clock = time % MAX_TIME;
+        clock = time % DAY_DURATION;
         clockTimer.reset();
     },
 };

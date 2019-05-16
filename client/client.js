@@ -120,7 +120,6 @@ function update(controls, elapsedTime) {
                 isInventoryOpen = false;
             } else if (action === 'give') {
                 if (player.giveItem(itemType)) {
-                    console.log('close?');
                     isInventoryOpen = false;
                 }
             } else {

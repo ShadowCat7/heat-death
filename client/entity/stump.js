@@ -1,4 +1,9 @@
 import entityFactory from '../entity/entity.js';
+import createTimer from '../utility/timer.js';
+import { DAY_DURATION } from '../hud/clock.js';
+import tree from './tree.js';
+
+const TREE_RESPAWN_TIMER = DAY_DURATION;
 
 export default {
     create: (options) => {
@@ -9,10 +14,22 @@ export default {
 
         options.interactive = false;
 
-        options.update = null;
-
         options.color = '#A0522D';
 
-        return entityFactory.create(options);
+        const stump = entityFactory.create(options);
+
+        const timer = createTimer(TREE_RESPAWN_TIMER);
+
+        stump.update = (controls, entityList, elapsedTime) => {
+            if (timer.update(elapsedTime)) {
+                const index = entityList.indexOf(stump);
+                entityList[index] = tree.create({
+                    x: stump.x,
+                    y: stump.y,
+                });
+            }
+        };
+
+        return stump;
     },
 };
