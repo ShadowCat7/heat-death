@@ -3,11 +3,21 @@ import { isEntitiesColliding, moveEntityTo } from '../../utility/physics.js';
 import { standStill } from '../monsters/behaviors.js';
 import { drawInteractText } from '../../utility/draw-utility.js';
 
-import { getPath as getCarpenterPath } from './carpenter.js';
+import {
+    getPath as getCarpenterPath,
+    getText as getCarpenterText,
+} from './carpenter.js';
 
 const MAX_SPEED = 20;
 
 export const CARPENTER = 'carpenter';
+
+const personMap = {
+    [CARPENTER]: {
+        getPath: getCarpenterPath,
+        getText: getCarpenterText,
+    }
+};
 
 export default {
     create: (options) => {
@@ -26,25 +36,22 @@ export default {
         options.talkable = true;
         options.personId = options.personId || 'person id';
 
-        options.pathFunc = () => {};
-
-        switch (options.personId) {
-            case CARPENTER:
-                options.pathFunc = getCarpenterPath;
-                break;
-            default:
-        }
+        const personFuncs = personMap[options.personId];
 
         options.getText = () => {
+            if (personFuncs) {
+                return personFuncs.getText();
+            }
+
             return ['Do you like my place?'];
         };
 
         options.update = (person, controls, entityList, elapsedTime, player) => {
-            const path = options.pathFunc();
-
             let newPosition;
 
-            if (path) {
+            if (personFuncs) {
+                const path = personFuncs.getPath();
+
                 newPosition = moveEntityTo(person, path.x, path.y, elapsedTime);
             } else {
                 newPosition = person.behavior(elapsedTime, player);

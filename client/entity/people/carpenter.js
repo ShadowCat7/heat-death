@@ -16,3 +16,7 @@ export const getPath = () => {
 
     return null;
 };
+
+export const getText = () => {
+    return [`I'm the carpenter.`, `I'll do any building you might need.`];
+};
