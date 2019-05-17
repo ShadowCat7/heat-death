@@ -58,7 +58,7 @@ export default({
                         y: actionMenuY,
                         width: ACTION_MENU_TOTAL_WIDTH,
                         height,
-                        horizontalPadding: H_TEXT_PADDING,
+                        leftPadding: H_TEXT_PADDING,
                         textColor: item.disabled ? DISABLED_TEXT_COLOR : DEFAULT_TEXT_COLOR,
                     });
 
@@ -67,8 +67,8 @@ export default({
                         VIEW_HEIGHT - (DEFAULT_PADDING + DEFAULT_LINE_HEIGHT + DEFAULT_BORDER_WIDTH)
                     );
 
-                    const cursorX = ACTION_MENU_X + DEFAULT_PADDING;
-                    const cursorY = actionMenuY + DEFAULT_PADDING + (DEFAULT_PADDING + DEFAULT_LINE_HEIGHT) * cursorActionPosition;
+                    const cursorX = ACTION_MENU_X + DEFAULT_BORDER_WIDTH + DEFAULT_PADDING;
+                    const cursorY = actionMenuY + DEFAULT_BORDER_WIDTH + DEFAULT_PADDING + (DEFAULT_PADDING + DEFAULT_LINE_HEIGHT) * cursorActionPosition;
                     ctx.drawImage(cursorImage, cursorX, cursorY);
                 }
 

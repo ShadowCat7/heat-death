@@ -1,6 +1,7 @@
 import {
+    CENTER_BOX_ALIGN,
     drawBorderedText,
-    getDimensions,
+    getDimensions, MIDDLE_BOX_ALIGN,
 } from './draw-utility.js';
 
 let alertText = null;
@@ -15,13 +16,13 @@ export default {
     draw: (ctx) => {
         if (alertText) {
             if (!drawOptions) {
-                drawOptions = getDimensions(ctx, alertText, { isBoxCentered: true });
+                drawOptions = getDimensions(ctx, alertText, {
+                    horizontalBoxAlign: CENTER_BOX_ALIGN,
+                    verticalBoxAlign: MIDDLE_BOX_ALIGN,
+                });
             }
 
-            drawBorderedText(ctx, alertText, {
-                isBoxCentered: true,
-                ...drawOptions
-            });
+            drawBorderedText(ctx, alertText, drawOptions);
         }
     },
     update: (controls) => {

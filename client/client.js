@@ -59,10 +59,11 @@ function update(controls, elapsedTime) {
     }
 
     if (player.talkingTo) {
-        speech.open(player.talkingTo.getText());
+        speech.open(player.talkingTo.getText(), ['talk']);
 
-        speech.update(controls, () => {
+        speech.update(controls, (action) => {
             player.talkingTo = null;
+            console.log(action);
         });
 
         return;

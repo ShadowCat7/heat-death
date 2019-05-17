@@ -74,7 +74,8 @@ export const drawBorder = (ctx, options = {}) => {
 const getTextWidth = (ctx, text, options) => {
     const {
         borderWidth = DEFAULT_BORDER_WIDTH,
-        horizontalPadding = DEFAULT_PADDING,
+        leftPadding = DEFAULT_PADDING,
+        rightPadding = DEFAULT_PADDING,
     } = options;
 
     let calculatedWidth = 0;
@@ -89,32 +90,47 @@ const getTextWidth = (ctx, text, options) => {
         }
     }
 
-    calculatedWidth += horizontalPadding * 2 + borderWidth * 2;
+    calculatedWidth += leftPadding + rightPadding + borderWidth * 2;
 
     return calculatedWidth;
 };
 
+export const LEFT_BOX_ALIGN = 'left';
+export const CENTER_BOX_ALIGN = 'center';
+export const RIGHT_BOX_ALIGN = 'right';
+export const TOP_BOX_ALIGN = 'top';
+export const MIDDLE_BOX_ALIGN = 'middle';
+export const BOTTOM_BOX_ALIGN = 'bottom';
 export const getDimensions = (ctx, text, options) => {
     const {
         borderWidth = DEFAULT_BORDER_WIDTH,
         lineHeight = DEFAULT_LINE_HEIGHT,
         verticalPadding = DEFAULT_PADDING,
-        isBoxCentered = false,
+        horizontalBoxAlign = LEFT_BOX_ALIGN,
+        verticalBoxAlign = TOP_BOX_ALIGN,
     } = options;
 
-    let { x, y } = options;
+    let { x = 0, y = 0 } = options;
 
     const textLineCount = (typeof text) === 'string' ? 1 : text.length;
 
     const width = getTextWidth(ctx, text, options);
     const height = borderWidth * 2 + verticalPadding + textLineCount * (lineHeight + verticalPadding);
 
-    if (isBoxCentered) {
-        x = VIEW_WIDTH / 2 - width / 2;
-        y = VIEW_HEIGHT / 2 - height / 2;
+    if (horizontalBoxAlign === CENTER_BOX_ALIGN) {
+        x += VIEW_WIDTH / 2 - width / 2;
+    } else if (horizontalBoxAlign === RIGHT_BOX_ALIGN) {
+        x += VIEW_WIDTH - width;
+    }
+
+    if (verticalBoxAlign === MIDDLE_BOX_ALIGN) {
+        y += VIEW_HEIGHT / 2 - height / 2;
+    } else if (verticalBoxAlign === BOTTOM_BOX_ALIGN) {
+        y += VIEW_HEIGHT - height;
     }
 
     return {
+        ...options,
         width,
         height,
         x,
@@ -127,7 +143,8 @@ export const drawBorderedText = (ctx, text, options = {}) => {
         width,
         height,
         borderWidth = DEFAULT_BORDER_WIDTH,
-        horizontalPadding = DEFAULT_PADDING,
+        leftPadding = DEFAULT_PADDING,
+        rightPadding = DEFAULT_PADDING,
         lineHeight = DEFAULT_LINE_HEIGHT,
         verticalPadding = DEFAULT_PADDING,
     } = options;
@@ -138,6 +155,8 @@ export const drawBorderedText = (ctx, text, options = {}) => {
 
     let calculatedHeight = height;
     if (!height) {
+        let textLineCount = (typeof text) === 'string' ? 1 : text.length;
+
         calculatedHeight = borderWidth * 2 + verticalPadding + textLineCount * (lineHeight + verticalPadding);
     }
     options.height = calculatedHeight;
@@ -147,7 +166,7 @@ export const drawBorderedText = (ctx, text, options = {}) => {
     drawText(
         ctx,
         text,
-        options.x + borderWidth + horizontalPadding,
+        options.x + borderWidth + leftPadding,
         options.y + borderWidth + verticalPadding,
         options
     );
