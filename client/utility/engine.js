@@ -64,8 +64,14 @@ function Engine(canvas, updateFunc, drawFunc) {
 
     document.addEventListener('keydown', (e) => {
         e.stopPropagation();
+
         keysPressedLabel.innerHTML = (e.code);
         buttonsPressed[e.code] = true;
+
+        if (!(buttonsPressed['KeyR'] && buttonsPressed['ControlLeft'] ||
+            buttonsPressed['Tab'] && buttonsPressed['AltLeft'])) {
+            e.preventDefault();
+        }
     });
 
     document.addEventListener('keyup', (e) => {
