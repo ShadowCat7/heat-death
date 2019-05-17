@@ -1,7 +1,7 @@
 import block from './entity/block.js';
 import fire from './entity/fire.js';
 import tree from './entity/tree.js';
-import person from './entity/person.js';
+import person from './entity/people/person.js';
 import { moveRandom } from './entity/monsters/behaviors.js';
 import sign from './entity/sign.js';
 import item from './entity/item.js';

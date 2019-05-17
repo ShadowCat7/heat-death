@@ -10,7 +10,7 @@ import clickableFactory from './click-element.js';
 import { loadGame, startGame } from '../utility/game.js';
 import { drawLine, drawRect, drawText } from '../utility/draw-utility.js';
 import uiControls from './ui-controls.js';
-import person from '../entity/person.js';
+import person from '../entity/people/person.js';
 import sign from '../entity/sign.js';
 
 const PANEL_PAD = 10;

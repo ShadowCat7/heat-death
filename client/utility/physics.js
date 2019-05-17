@@ -100,3 +100,15 @@ export const isEntitiesColliding = (entity1, x1, y1, entity2) => {
         didCollide,
     };
 };
+
+export const moveEntityTo = (entity, x, y, elapsedTime) => {
+    const theta = getDirection(entity.x, entity.y, x, y);
+
+    const xDiff = entity.maxSpeed * Math.cos(theta) * elapsedTime;
+    const yDiff = entity.maxSpeed * Math.sin(theta) * elapsedTime;
+
+    return {
+        newX: entity.x + xDiff,
+        newY: entity.y + yDiff,
+    }
+};

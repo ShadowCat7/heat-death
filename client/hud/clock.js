@@ -8,7 +8,7 @@ const TEXT_X = VIEW_WIDTH - H_PADDING - 80;
 const TEXT_Y = V_PADDING + HP_BAR_HEIGHT;
 
 // 60 min in an hour, * 24 hours
-const MINUTES_IN_HOUR = 60;
+export const MINUTES_IN_HOUR = 60;
 export const DAY_DURATION = MINUTES_IN_HOUR * 24;
 
 let clock = 1435;

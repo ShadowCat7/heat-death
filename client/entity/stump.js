@@ -16,11 +16,9 @@ export default {
 
         options.color = '#A0522D';
 
-        const stump = entityFactory.create(options);
-
         const timer = createTimer(TREE_RESPAWN_TIMER);
 
-        stump.update = (controls, entityList, elapsedTime) => {
+        options.update = (stump, controls, entityList, elapsedTime) => {
             if (timer.update(elapsedTime)) {
                 const index = entityList.indexOf(stump);
                 entityList[index] = tree.create({
@@ -30,6 +28,6 @@ export default {
             }
         };
 
-        return stump;
+        return entityFactory.create(options);
     },
 };

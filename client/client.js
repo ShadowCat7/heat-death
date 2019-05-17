@@ -1,6 +1,6 @@
 import playerFactory from './player/player.js';
 import monsterFactory from './entity/monsters/monster.js';
-import { chasePlayerIfClose } from './entity/monsters/behaviors.js';
+import { chasePlayerIfClose, moveRandom } from './entity/monsters/behaviors.js';
 import inventoryMenu from './player/inventory.js';
 import craftingMenu from './player/crafting.js';
 import speech from './player/speech.js';
@@ -16,6 +16,8 @@ import sign from './entity/sign.js';
 import notify from './utility/notify.js';
 import bulletinMenu from './player/bulletin-board.js';
 import bulletin from './entity/bulletin.js';
+import person, { CARPENTER } from './entity/people/person.js';
+import { LEVEL_WIDTH } from './constants.js';
 
 let sprites = null;
 
@@ -187,6 +189,13 @@ loadGame((images) => {
 
     levels.insert(load(level0_0), 0, 0);
     levels.insert(load(level1_0), 1, 0);
+
+    levels.createEntity(person.create({
+        x: 480 + LEVEL_WIDTH,
+        y: 160,
+        personId: CARPENTER,
+        behavior: moveRandom,
+    }));
 
     startGame(update, draw);
 });

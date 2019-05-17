@@ -1,5 +1,5 @@
 import createTimer from '../../utility/timer.js';
-import { distance, getDirection } from '../../utility/physics.js';
+import { distance, getDirection, moveEntityTo } from '../../utility/physics.js';
 
 export const moveRandom = (monster) => {
     const timer = createTimer(Math.random() * 4 + 3);
@@ -51,15 +51,7 @@ export const standStill = (monster) => {
 
 export const chasePlayer = (monster) => {
     return (elapsedTime, player) => {
-        const theta = getDirection(monster.x, monster.y, player.x, player.y);
-
-        const xDiff = monster.maxSpeed * Math.cos(theta) * elapsedTime;
-        const yDiff = monster.maxSpeed * Math.sin(theta) * elapsedTime;
-
-        return {
-            newX: monster.x + xDiff,
-            newY: monster.y + yDiff,
-        }
+        return moveEntityTo(monster, player.x, player.y, elapsedTime);
     };
 };
 
