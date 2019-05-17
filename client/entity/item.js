@@ -28,7 +28,9 @@ export default {
             defaultDraw(ctx, viewX, viewY);
 
             if (entity.inInteractRange) {
-                drawInteractText(ctx, viewX, viewY, INTERACT_TEXT[entity.itemType], entity);
+                const interactText = INTERACT_TEXT[entity.itemType] || entity.itemType;
+
+                drawInteractText(ctx, viewX, viewY, interactText, entity);
             }
         };
 
