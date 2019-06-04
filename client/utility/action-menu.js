@@ -5,12 +5,11 @@ import {
     getDimensions, DEFAULT_BORDER_WIDTH, DEFAULT_PADDING, DEFAULT_LINE_HEIGHT,
 } from './draw-utility.js';
 
-import { SPEECH_HEIGHT } from '../player/speech.js';
-
+const DISABLED_TEXT_COLOR = '#777';
 const CURSOR_WIDTH = 30;
 const CURSOR_PADDING = DEFAULT_BORDER_WIDTH + DEFAULT_PADDING;
 
-const CANCEL = 'cancel';
+export const CANCEL = 'cancel';
 
 let cursorImage = null;
 let isOpen = false;
@@ -26,6 +25,7 @@ export default {
         actions = actionMenuChoices.concat(CANCEL);
     },
     open: () => {
+        drawOptions = null;
         isOpen = true;
         cursorPosition = 0;
     },
@@ -33,8 +33,8 @@ export default {
         if (!isOpen) return false;
 
         if (controls.escape) {
+            isOpen = false;
             closeCallback(CANCEL);
-            return false;
         }
 
         if (controls.moveUp && !controls.previousControls.moveUp) {
@@ -52,21 +52,24 @@ export default {
 
         return true;
     },
-    draw: (ctx) => {
+    draw: (ctx, x, y) => {
         if (!isOpen) return;
 
         if (!drawOptions) {
             drawOptions = getDimensions(ctx, actions, {
-                y: -SPEECH_HEIGHT + DEFAULT_BORDER_WIDTH,
                 horizontalBoxAlign: RIGHT_BOX_ALIGN,
                 verticalBoxAlign: BOTTOM_BOX_ALIGN,
                 leftPadding: CURSOR_WIDTH + DEFAULT_PADDING * 2,
             });
         }
 
-        drawBorderedText(ctx, actions, drawOptions);
+        drawBorderedText(ctx, actions, {
+            ...drawOptions,
+            x: drawOptions.x + (x || 0),
+            y: drawOptions.y + (y || 0),
+        });
 
-        const cursorY = drawOptions.y + CURSOR_PADDING + (DEFAULT_LINE_HEIGHT + DEFAULT_PADDING) * cursorPosition;
+        const cursorY = drawOptions.y + (y || 0) + CURSOR_PADDING + (DEFAULT_LINE_HEIGHT + DEFAULT_PADDING) * cursorPosition;
 
         ctx.drawImage(cursorImage, drawOptions.x + CURSOR_PADDING, cursorY);
     },

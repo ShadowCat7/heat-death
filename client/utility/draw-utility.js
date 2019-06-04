@@ -144,7 +144,6 @@ export const drawBorderedText = (ctx, text, options = {}) => {
         height,
         borderWidth = DEFAULT_BORDER_WIDTH,
         leftPadding = DEFAULT_PADDING,
-        rightPadding = DEFAULT_PADDING,
         lineHeight = DEFAULT_LINE_HEIGHT,
         verticalPadding = DEFAULT_PADDING,
     } = options;

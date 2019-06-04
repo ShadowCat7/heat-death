@@ -63,7 +63,6 @@ function update(controls, elapsedTime) {
 
         speech.update(controls, (action) => {
             player.talkingTo = null;
-            console.log(action);
         });
 
         return;
@@ -112,7 +111,7 @@ function update(controls, elapsedTime) {
         inventoryMenu.update(true, controls, (itemType, action) => {
             player.addItemMenu = false;
 
-            if (!itemType) {
+            if (!itemType || !action) {
                 isInventoryOpen = false;
             } else if (action === 'drop') {
                 const droppedItem = player.dropItem(itemType, action);

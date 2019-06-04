@@ -1,5 +1,12 @@
 import { VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
-import { DEFAULT_BORDER_COLOR, drawBorder, drawBorderedText, drawRect, drawText } from '../utility/draw-utility.js';
+import {
+    DEFAULT_BORDER_COLOR,
+    DEFAULT_BORDER_WIDTH,
+    drawBorder,
+    drawBorderedText,
+    drawRect,
+    drawText,
+} from '../utility/draw-utility.js';
 import actionMenu from '../utility/action-menu.js';
 
 const V_PADDING = 10;
@@ -50,7 +57,6 @@ export default {
             textIndex += 2;
 
             if (textIndex >= textToShow.length) {
-
                 if (usingActionMenu) {
                     actionMenu.open();
                 } else {
@@ -79,6 +85,6 @@ export default {
             }, CURSOR_X, CURSOR_Y, DEFAULT_BORDER_COLOR);
         }
 
-        actionMenu.draw(ctx);
+        actionMenu.draw(ctx, 0, -SPEECH_HEIGHT + DEFAULT_BORDER_WIDTH);
     },
 };

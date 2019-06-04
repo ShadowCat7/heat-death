@@ -52,8 +52,12 @@ export default {
             if (personFuncs) {
                 const path = personFuncs.getPath();
 
-                newPosition = moveEntityTo(person, path.x, path.y, elapsedTime);
-            } else {
+                if (path) {
+                    newPosition = moveEntityTo(person, path.x, path.y, elapsedTime);
+                }
+            }
+
+            if (!newPosition) {
                 newPosition = person.behavior(elapsedTime, player);
             }
 
