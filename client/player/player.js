@@ -10,52 +10,12 @@ import {
 import { GRID_SIZE, INTERACT_RADIUS } from '../constants.js';
 import item from '../entity/item.js';
 import stump from '../entity/stump.js';
-import createTimer from '../utility/timer.js';
-import { drawRect } from '../utility/draw-utility.js';
 import { CRAFTABLE_ITEMS } from './crafting.js';
 import notify from '../utility/notify.js';
 import { QUESTS } from './bulletin-board.js';
+import swordFactory from './weapons/sword.js';
 
 const MAX_SPEED = 300;
-const ATTACK_TIME_LIMIT = 0.3;
-
-const SWORD_WIDTH = 10;
-const SWORD_LENGTH = 30;
-
-const attackTimer = createTimer(ATTACK_TIME_LIMIT);
-
-const getSwordPosition = (player, direction) => {
-    let swordX = player.x;
-    let swordY = player.y;
-
-    const movingPosition = (player.rect.width + SWORD_WIDTH) * (attackTimer.getTime() / ATTACK_TIME_LIMIT);
-
-    let width;
-    let height;
-    if (direction === 'up') {
-        swordY -= player.rect.height;
-        swordX = player.x - SWORD_WIDTH + movingPosition;
-        width = SWORD_WIDTH;
-        height = SWORD_LENGTH;
-    } else if (direction === 'down') {
-        swordY += player.rect.height;
-        swordX = player.x + player.rect.width - movingPosition;
-        width = SWORD_WIDTH;
-        height = SWORD_LENGTH;
-    } else if (direction === 'left') {
-        swordX -= player.rect.width;
-        swordY = player.y + player.rect.height - movingPosition;
-        width = SWORD_LENGTH;
-        height = SWORD_WIDTH;
-    } else if (direction === 'right') {
-        swordX += player.rect.width;
-        swordY = player.y - SWORD_WIDTH + movingPosition;
-        width = SWORD_LENGTH;
-        height = SWORD_WIDTH;
-    }
-
-    return { swordX, swordY, width, height };
-};
 
 export default {
     create: (options) => {
@@ -70,49 +30,46 @@ export default {
         options.quests = [];
         options.health = 100;
 
-        let direction = null;
-        let attacking = false;
+        options.direction = 'down';
+
         let interactWith = null;
 
         options.update = (player, controls, entityList, elapsedTime) => {
             player.entityInRange = null;
+            const weapon = player.weapon;
 
             let newX = player.x;
             let newY = player.y;
 
             if (controls.moveUp) {
                 newY -= elapsedTime * MAX_SPEED;
-                if (!attacking) {
-                    direction = 'up';
+                if (!player.attacking) {
+                    player.direction = 'up';
                 }
             }
             if (controls.moveDown) {
                 newY += elapsedTime * MAX_SPEED;
-                if (!attacking) {
-                    direction = 'down';
+                if (!player.attacking) {
+                    player.direction = 'down';
                 }
             }
             if (controls.moveLeft) {
                 newX -= elapsedTime * MAX_SPEED;
-                if (!attacking) {
-                    direction = 'left';
+                if (!player.attacking) {
+                    player.direction = 'left';
                 }
             }
             if (controls.moveRight) {
                 newX += elapsedTime * MAX_SPEED;
-                if (!attacking) {
-                    direction = 'right';
+                if (!player.attacking) {
+                    player.direction = 'right';
                 }
             }
 
-            if (!attacking && controls.attack && !controls.previousControls.attack) {
-                attacking = true;
-            }
-
-            if (attacking) {
-                if (attackTimer.update(elapsedTime)) {
-                    attacking = false;
-                }
+            if (!player.attacking && controls.attack && !controls.previousControls.attack) {
+                player.attacking = true;
+                // Setting default positioning for player position and direction
+                weapon.update(0, player);
             }
 
             let closestItemIndex = null;
@@ -126,10 +83,21 @@ export default {
 
                 const { x, y, didCollide } = isEntitiesColliding(player, newX, newY, entity);
 
-                if (entity.type === 'monster' && attacking) {
-                    let { swordX, swordY, height, width } = getSwordPosition(player, direction);
+                if (entity.type === 'monster' && player.attacking) {
+                    // TODO: Adding newX and newY because our position hasn't been updated.
+                    // If we're running into a wall this might extend our range sometimes.
+                    // We can fix this by doing a loop on walls first, which will help
+                    // clean up our chunking (level) logic.
+                    const colliding = isRectsColliding(
+                        weapon.rect,
+                        weapon.x + newX,
+                        weapon.y + newY,
+                        entity.rect,
+                        entity.x,
+                        entity.y
+                    );
 
-                    if (isRectsColliding({ width, height }, swordX, swordY, entity.rect, entity.x, entity.y)) {
+                    if (colliding) {
                         entityList[i] = item.create({
                             causesCollisions: false,
                             width: entity.rect.width,
@@ -174,6 +142,13 @@ export default {
                 }
             }
 
+            player.x = newX;
+            player.y = newY;
+
+            if (player.attacking) {
+                weapon.update(elapsedTime, player);
+            }
+
             if (closestItemIndex !== null) {
                 const entity = entityList[closestItemIndex];
                 entity.inInteractRange = true;
@@ -211,9 +186,6 @@ export default {
                     player.entityInRange = entity;
                 }
             }
-
-            player.x = newX;
-            player.y = newY;
         };
 
         options.color = '#5555ff';
@@ -224,16 +196,12 @@ export default {
         player.draw = (ctx, viewX, viewY) => {
             defaultDraw(ctx, viewX, viewY);
 
-            if (attacking) {
-                let { swordX, swordY, width, height } = getSwordPosition(player, direction);
-
-                drawRect(ctx, {
-                    width,
-                    height,
-                }, swordX - viewX, swordY - viewY, '#55aacc');
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
+            if (player.attacking) {
+                player.weapon.draw(ctx, viewX, viewY);
             }
         };
+
+        player.weapon = swordFactory.create();
 
         player.dropItem = (itemType) => {
             const itemCount = player.inventory[itemType];
