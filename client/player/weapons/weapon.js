@@ -1,7 +1,7 @@
 import { drawRect } from '../../utility/draw-utility.js';
 import createTimer from '../../utility/timer.js';
 
-const getWeaponPosition = (player, weapon) => {
+const getWeaponPosition = (weapon, player) => {
     let weaponX = player.x;
     let weaponY = player.y;
 
@@ -44,16 +44,23 @@ export default {
         };
 
         const attackTimer = createTimer(weapon.attackTimeLimit);
+        let isSwinging = false;
 
         weapon.getAttackTime = attackTimer.getTime;
 
         weapon.update = (elapsedTime, player) => {
             if (attackTimer.update(elapsedTime)) {
                 player.attacking = false;
+                isSwinging = false;
             } else {
                 const {
                     weaponX, weaponY, width, height,
-                } = getWeaponPosition(player, weapon);
+                } = getWeaponPosition(weapon, player);
+
+                if (!isSwinging) {
+                    isSwinging = true;
+                    weapon.onSwing(weapon, player);
+                }
 
                 weapon.x = weaponX;
                 weapon.y = weaponY;

@@ -13,7 +13,7 @@ import stump from '../entity/stump.js';
 import { CRAFTABLE_ITEMS } from './crafting.js';
 import notify from '../utility/notify.js';
 import { QUESTS } from './bulletin-board.js';
-import swordFactory from './weapons/sword.js';
+import gunFactory from './weapons/gun.js';
 
 const MAX_SPEED = 300;
 
@@ -69,7 +69,7 @@ export default {
             if (!player.attacking && controls.attack && !controls.previousControls.attack) {
                 player.attacking = true;
                 // Setting default positioning for player position and direction
-                weapon.update(0, player);
+                weapon.update(elapsedTime, player);
             }
 
             let closestItemIndex = null;
@@ -201,7 +201,7 @@ export default {
             }
         };
 
-        player.weapon = swordFactory.create();
+        player.weapon = gunFactory.create({ speed: 1000 });
 
         player.dropItem = (itemType) => {
             const itemCount = player.inventory[itemType];
