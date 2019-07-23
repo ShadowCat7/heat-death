@@ -1,5 +1,6 @@
 import { drawRect, rotateDrawRect } from '../../utility/draw-utility.js';
 import createTimer from '../../utility/timer.js';
+import cheats from '../../cheats.js';
 
 // this angle should be determined from weapon.length
 const HALF_SWING = Math.PI / 3;
@@ -119,7 +120,9 @@ export default {
                 });
 
                 // hitbox draw
-                drawRect(ctx, weapon.rect, weapon.x - viewX, weapon.y - viewY, '#aa77cc');
+                if (cheats.isShowingHitboxes()) {
+                    drawRect(ctx, weapon.rect, weapon.x - viewX, weapon.y - viewY, '#aa77cc');
+                }
             };
         }
 

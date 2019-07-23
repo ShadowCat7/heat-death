@@ -24,7 +24,6 @@ export const rotateDrawRect = (ctx, options) => {
         rotation,
     } = options;
 
-    console.log(rotateX, rotateY, x, y);
     const translateX = rotateX + x;
     const translateY = rotateY + y;
 
