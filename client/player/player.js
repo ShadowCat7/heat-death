@@ -13,7 +13,7 @@ import stump from '../entity/stump.js';
 import { CRAFTABLE_ITEMS } from './crafting.js';
 import notify from '../utility/notify.js';
 import { QUESTS } from './bulletin-board.js';
-import gunFactory from './weapons/gun.js';
+import swordFactory from './weapons/sword.js';
 
 const MAX_SPEED = 300;
 
@@ -201,7 +201,7 @@ export default {
             }
         };
 
-        player.weapon = gunFactory.create({ speed: 1000 });
+        player.weapon = swordFactory.create({ speed: 1000 });
 
         player.dropItem = (itemType) => {
             const itemCount = player.inventory[itemType];

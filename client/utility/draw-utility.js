@@ -13,6 +13,31 @@ export const drawLine = (ctx, startX, startY, endX, endY, color) => {
     ctx.stroke();
 };
 
+export const rotateDrawRect = (ctx, options) => {
+    const {
+        rect,
+        x,
+        y,
+        color,
+        rotateX,
+        rotateY,
+        rotation,
+    } = options;
+
+    console.log(rotateX, rotateY, x, y);
+    const translateX = rotateX + x;
+    const translateY = rotateY + y;
+
+    ctx.translate(translateX, translateY);
+    ctx.rotate(rotation);
+    ctx.translate(-translateX, -translateY);
+
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, rect.width, rect.height);
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+};
+
 const setupTextContext = (ctx, options = {}) => {
     const {
         font = DEFAULT_FONT,
