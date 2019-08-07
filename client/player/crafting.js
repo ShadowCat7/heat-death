@@ -18,10 +18,16 @@ const getCraftingMenuItem = (item, inventory) => {
     let costText = '';
     let cannotBuild = true;
 
-    for (let itemName in item.cost) {
-        costText += `${itemName} ${inventory[itemName] || 0}/${item.cost[itemName]} `;
 
-        if (inventory[itemName] >= item.cost[itemName]) {
+    for (let itemName in item.cost) {
+        const inventoryItem = inventory.getKey(itemName) || {};
+        console.log(inventoryItem);
+
+        const count = inventoryItem.count || 0;
+
+        costText += `${itemName} ${count}/${item.cost[itemName]} `;
+
+        if (count >= item.cost[itemName]) {
             cannotBuild = false;
         }
     }
