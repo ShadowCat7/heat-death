@@ -1,3 +1,4 @@
+import './cheats.js';
 import playerFactory from './player/player.js';
 import monsterFactory from './entity/monsters/monster.js';
 import { chasePlayerIfClose, moveRandom } from './entity/monsters/behaviors.js';
@@ -10,7 +11,6 @@ import level1_0 from './levels/level1_0.js';
 import { loadGame, startGame } from './utility/game.js';
 import hud from './hud/hud.js';
 
-import './cheats.js';
 import levels from './levels/levels.js';
 import sign from './entity/sign.js';
 import notify from './utility/notify.js';
@@ -18,6 +18,7 @@ import bulletinMenu from './player/bulletin-board.js';
 import bulletin from './entity/bulletin.js';
 import person, { CARPENTER } from './entity/people/person.js';
 import { LEVEL_WIDTH } from './constants.js';
+import events, { EVENTS } from './utility/events.js';
 
 let sprites = null;
 
@@ -25,27 +26,42 @@ let player = null;
 
 let currentControls = {};
 
-let isInventoryOpen = false;
-let isCraftingOpen = false;
-let isBulletinOpen = false;
-
 const possibleQuests = [0];
+let currentEvent = null;
+
+const doEventIfRaisedFunc = (controls, currentEvent) => {
+    return (control, event) => {
+        if (controls[control] && !controls.previousControls[control]) {
+            if (currentEvent === event) {
+                events.drop();
+            } else {
+                events.raise(event);
+            }
+        }
+    };
+};
+
+const drawGame = (ctx) => {
+    levels.draw(ctx, player);
+
+    speech.draw(ctx);
+
+    hud.draw(ctx, player);
+};
 
 function draw(ctx) {
-    if (isBulletinOpen) {
+    drawGame(ctx);
+
+    if (currentEvent === EVENTS.BULLETIN) {
         bulletinMenu.draw(ctx);
-    } else if (isInventoryOpen) {
+    } else if (currentEvent === EVENTS.INVENTORY || currentEvent === EVENTS.INTERACT) {
         inventoryMenu.draw(ctx);
-    } else if (isCraftingOpen) {
+    } else if (currentEvent === EVENTS.CRAFTING) {
         craftingMenu.draw(ctx);
     } else if (currentControls.map) {
         levels.drawMap(ctx, player);
     } else {
-        levels.draw(ctx, player);
-
-        speech.draw(ctx);
-
-        hud.draw(ctx, player);
+        drawGame(ctx);
     }
 
     notify.draw(ctx);
@@ -58,105 +74,103 @@ function update(controls, elapsedTime) {
         return;
     }
 
-    if (player.talkingTo) {
-        speech.open(player.talkingTo.getText(), ['talk']);
+    currentEvent = events.get();
+    const doEventIfRaised = doEventIfRaisedFunc(controls, currentEvent);
+
+    doEventIfRaised('questLog', EVENTS.BULLETIN);
+    doEventIfRaised('crafting', EVENTS.CRAFTING);
+    doEventIfRaised('inventory', EVENTS.INVENTORY);
+
+    currentEvent = events.get();
+    const isEventUnhandled = !events.isAcknowledged();
+
+    if (currentEvent === EVENTS.TALKING) {
+        if (isEventUnhandled) {
+            speech.open(player.talkingTo.getText(), ['talk']);
+            events.acknowledge();
+        }
 
         speech.update(controls, (action) => {
+            events.drop();
             player.talkingTo = null;
         });
-
-        return;
-    }
-
-    if (player.checkBulletin) {
-        player.checkBulletin = false;
-        bulletinMenu.updateMenuItems(possibleQuests, true);
-        isBulletinOpen = true;
-    }
-
-    if (controls.questLog && !controls.previousControls.questLog) {
-        bulletinMenu.updateMenuItems(player.quests, false);
-        isBulletinOpen = !isBulletinOpen;
-        isInventoryOpen = false;
-        isCraftingOpen = false;
-    }
-
-    if (controls.inventory && !controls.previousControls.inventory) {
-        isInventoryOpen = !isInventoryOpen;
-        isCraftingOpen = false;
-        isBulletinOpen = false;
-
-        inventoryMenu.changeTitle('Inventory');
-        inventoryMenu.updateMenuItems(player.inventory, player.entityInRange && player.entityInRange.type === 'person');
-    }
-
-    if (player.addItemMenu) {
-        isInventoryOpen = true;
-        isCraftingOpen = false;
-        isBulletinOpen = false;
-
-        inventoryMenu.changeTitle('Use Item');
-        inventoryMenu.updateMenuItems(player.inventory);
-    }
-
-    if (controls.crafting  && !controls.previousControls.crafting) {
-        isCraftingOpen = !isCraftingOpen;
-        isInventoryOpen = false;
-        isBulletinOpen = false;
-
-        craftingMenu.updateMenuItems(player.inventory);
-    }
-
-    if (isInventoryOpen) {
-        inventoryMenu.update(true, controls, (itemType, action) => {
-            player.addItemMenu = false;
-
-            if (!itemType || !action) {
-                isInventoryOpen = false;
-            } else if (action === 'drop') {
-                const droppedItem = player.dropItem(itemType, action);
-                if (droppedItem) {
-                    levels.createEntity(droppedItem);
-                }
-
-                isInventoryOpen = false;
-            } else if (action === 'give') {
-                if (player.giveItem(itemType)) {
-                    isInventoryOpen = false;
-                }
+    } else if (currentEvent === EVENTS.BULLETIN) {
+        if (isEventUnhandled) {
+            if (player.talkingTo) {
+                player.talkingTo = null;
+                bulletinMenu.updateMenuItems(possibleQuests, true);
             } else {
-                const actionSucceeded = player.useItem(itemType);
-
-                if (actionSucceeded) {
-                    isInventoryOpen = false;
-                } else {
-                    notify.alert('Nothing happens');
-                }
+                bulletinMenu.updateMenuItems(player.quests, false);
             }
-        });
-    } else if (isCraftingOpen) {
-        craftingMenu.update(true, controls, (itemType) => {
-            isCraftingOpen = false;
 
-            if (itemType) {
-                player.craftItem(itemType);
+            events.acknowledge();
+        }
 
-                craftingMenu.updateMenuItems(player.inventory);
-            }
-        });
-    } else if (isBulletinOpen) {
         bulletinMenu.update(true, controls, (questId) => {
             if (questId !== null) {
                 player.quests.push(questId);
                 possibleQuests.splice(questId, 1);
             }
 
-            isBulletinOpen = false;
+            events.drop();
+        });
+    } else if (currentEvent === EVENTS.INVENTORY || currentEvent === EVENTS.INTERACT) {
+        if (isEventUnhandled) {
+            if (player.interactWith) {
+                inventoryMenu.changeTitle('Use Item');
+                inventoryMenu.updateMenuItems(player.inventory, player.entityInRange && player.entityInRange.type === 'person');
+            } else {
+                inventoryMenu.changeTitle('Inventory');
+                inventoryMenu.updateMenuItems(player.inventory);
+            }
+
+            events.acknowledge();
+        }
+
+        inventoryMenu.update(true, controls, (itemType, action) => {
+            player.addItemMenu = false;
+
+            if (!itemType || !action) {
+                events.drop();
+            } else if (action === 'drop') {
+                player.dropItem(itemType, action);
+
+                events.drop();
+            } else if (action === 'give') {
+                if (player.giveItem(itemType)) {
+                    events.drop();
+                }
+            } else {
+                const actionSucceeded = player.useItem(itemType);
+
+                if (actionSucceeded) {
+                    events.drop();
+                } else {
+                    notify.alert('Nothing happens');
+                }
+            }
+        });
+    } else if (currentEvent === EVENTS.CRAFTING) {
+        if (isEventUnhandled) {
+            craftingMenu.updateMenuItems(player.inventory);
+            events.acknowledge();
+        }
+
+        craftingMenu.update(true, controls, (itemType) => {
+            if (itemType) {
+                player.craftItem(itemType);
+
+                craftingMenu.updateMenuItems(player.inventory);
+            } else {
+                events.drop();
+            }
         });
     } else if (!controls.map) {
         hud.update(elapsedTime);
 
         levels.update(controls, elapsedTime, player);
+
+        levels.cleanEntities();
     }
 }
 
@@ -164,13 +178,9 @@ loadGame((images) => {
     sprites = images;
 
     inventoryMenu.initialize(sprites);
-
     craftingMenu.initialize(sprites);
-
     bulletinMenu.initialize(sprites);
-
     speech.initialize(sprites);
-
     sign.initialize(sprites);
     bulletin.initialize(sprites);
 

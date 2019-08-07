@@ -14,9 +14,9 @@ const STARTING_LINE = DEFAULT_PADDING * 2 + DEFAULT_LINE_HEIGHT;
 const LINE_COUNT = Math.floor((VIEW_HEIGHT - STARTING_LINE) / (DEFAULT_LINE_HEIGHT + DEFAULT_PADDING));
 
 export default({
-    items,
-    title,
-    cursorImage,
+   items,
+   title,
+   cursorImage,
 }) => {
     let cursorPosition = 0;
     let cursorShown = false;

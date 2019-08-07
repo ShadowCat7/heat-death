@@ -1,12 +1,12 @@
-import createMenu from '../utility/menu.js';
+import createMenu from '../utility/slot-menu.js';
 
 let inventoryMenu = null;
 
 const getInventory = (inventory, entityInRange) => {
     const inventoryItems = [];
 
-    for (let itemType in inventory) {
-        const itemCount = inventory[itemType];
+    inventory.forEach(i => {
+        const item = i || {};
 
         const actions = ['use'];
         if (entityInRange) {
@@ -16,12 +16,12 @@ const getInventory = (inventory, entityInRange) => {
         actions.push('drop');
 
         inventoryItems.push({
-            label: `${itemType}: ${itemCount}`,
-            id: itemType,
-            disabled: itemCount === 0,
+            label: `${item.key}: ${item.count}`,
+            id: item.key,
+            disabled: item.count === 0,
             actions,
         });
-    }
+    });
 
     return inventoryItems;
 };

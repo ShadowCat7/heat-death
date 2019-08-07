@@ -4,6 +4,7 @@ import { LEVEL_HEIGHT, LEVEL_WIDTH, VIEW_HEIGHT, VIEW_WIDTH } from '../constants
 
 const levels = [];
 
+let entitiesToRemove = [];
 let entityList = [];
 
 export default {
@@ -52,6 +53,23 @@ export default {
     },
     createEntity: (entity) => {
         entityList.push(entity);
+    },
+    removeEntity: (entity) => {
+        entitiesToRemove.push(entity);
+    },
+    cleanEntities: () => {
+        if (!entitiesToRemove.length) return;
+
+        for (let i = 0; i < entityList.length; i++) {
+            for (let j = 0; j < entitiesToRemove.length; j++) {
+                if (entityList[i] === entitiesToRemove[j]) {
+                    entityList.splice(i, 1);
+                    i -= 1;
+                }
+            }
+        }
+
+        entitiesToRemove = [];
     },
     load: () => {
 

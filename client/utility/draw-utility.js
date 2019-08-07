@@ -1,8 +1,13 @@
-import { VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
+import { GRID_SIZE, VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
 
 export const drawRect = (ctx, rect, x, y, color) => {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, rect.width, rect.height);
+};
+
+export const fillScreen = (ctx, color) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 };
 
 export const drawLine = (ctx, startX, startY, endX, endY, color) => {
@@ -204,4 +209,41 @@ export const drawInteractText = (ctx, viewX, viewY, action, entity) => {
         textAlign: 'center',
         textBaseline: 'bottom',
     });
+};
+
+const SLOT_WIDTH = 55;
+const SLOT_BORDER_WIDTH = 5;
+const SLOT_COLOR = '#e0e0e0';
+export const drawSlot = (ctx, {
+    x,
+    y,
+    width = SLOT_WIDTH,
+    borderWidth = SLOT_BORDER_WIDTH,
+    color = SLOT_COLOR,
+}) => {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = borderWidth;
+    ctx.rect(x + borderWidth / 2, y + borderWidth / 2, width, width);
+    ctx.stroke();
+};
+
+export const drawSlotWithItem = (ctx, {
+    x,
+    y,
+    itemColor,
+    width = SLOT_WIDTH,
+    borderWidth = SLOT_BORDER_WIDTH,
+    color = SLOT_COLOR,
+}) => {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = borderWidth;
+    ctx.rect(x + borderWidth / 2, y + borderWidth / 2, width, width);
+    ctx.stroke();
+
+    const diff = borderWidth + (width - borderWidth - GRID_SIZE) / 2;
+
+    ctx.fillStyle = itemColor;
+    ctx.fillRect(x + diff, y + diff, GRID_SIZE, GRID_SIZE);
 };

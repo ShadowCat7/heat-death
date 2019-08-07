@@ -17,8 +17,6 @@ const getWeaponPosition = (weapon, player) => {
     const movingPosition = (player.rect.width + weapon.width) * animationComplete;
     const rotation = -HALF_SWING + 2 * HALF_SWING * animationComplete;
 
-    console.log(rotation);
-
     let width;
     let height;
     if (player.direction === 'up') {

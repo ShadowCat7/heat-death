@@ -17,7 +17,7 @@ const removeItem = (map, list, key, count) => {
 
     if (item.count <= count) {
         delete map[key];
-        list[index] = null;
+        list[item.index] = null;
         returnCount = item.count;
     } else {
         item.count -= count;
@@ -42,7 +42,7 @@ export default (size) => {
             let index = null;
 
             if (!item) {
-                for (let i = 0; i < size || index !== null; i++) {
+                for (let i = 0; i < size && index === null; i++) {
                     if (!list[i]) {
                         index = i;
                     }
@@ -52,12 +52,16 @@ export default (size) => {
                     return false;
                 }
 
-                item = { key, index, count };
+                item = {
+                    key,
+                    index,
+                    count: count || 1,
+                };
 
                 map[key] = item;
                 list[index] = key;
             } else {
-                item.count += count;
+                item.count += count || 1;
             }
 
             return true;
@@ -96,6 +100,8 @@ export default (size) => {
         },
         getKey: (key) => {
             const item = map[key];
+
+            if (!item) return null;
 
             return {
                 key,

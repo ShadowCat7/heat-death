@@ -7,13 +7,17 @@ import {
     rectEntityDistance,
 } from '../utility/physics.js';
 
-import { GRID_SIZE, INTERACT_RADIUS } from '../constants.js';
-import item from '../entity/item.js';
-import stump from '../entity/stump.js';
+import {  INTERACT_RADIUS } from '../constants.js';
+import itemFactory from '../entity/item.js';
 import { CRAFTABLE_ITEMS } from './crafting.js';
 import notify from '../utility/notify.js';
 import { QUESTS } from './bulletin-board.js';
 import swordFactory from './weapons/sword.js';
+import createInventory from '../items/item-storage.js';
+import levels from '../levels/levels.js';
+import interactions from './interactions.js';
+
+const INVENTORY_SIZE = 30;
 
 const MAX_SPEED = 300;
 
@@ -24,9 +28,9 @@ export default {
 
         options.type = 'player';
 
-        options.inventory = {
-            metal: 10,
-        };
+        options.inventory = createInventory(INVENTORY_SIZE);
+        options.inventory.addItem('metal', 10);
+
         options.quests = [];
         options.health = 100;
 
@@ -83,6 +87,7 @@ export default {
 
                 const { x, y, didCollide } = isEntitiesColliding(player, newX, newY, entity);
 
+                // fighting monsters
                 if (entity.type === 'monster' && player.attacking) {
                     // TODO: Adding newX and newY because our position hasn't been updated.
                     // If we're running into a wall this might extend our range sometimes.
@@ -98,14 +103,12 @@ export default {
                     );
 
                     if (colliding) {
-                        entityList[i] = item.create({
-                            causesCollisions: false,
-                            width: entity.rect.width,
-                            height: entity.rect.height,
-                            x: entity.x,
-                            y: entity.y,
-                            itemType: 'corpse',
-                        });
+                        levels.createEntity(itemFactory.dropItem(
+                            entity.x,
+                            entity.y,
+                            { key: 'corpse' },
+                            entity.rect,
+                        ));
                     }
                 }
 
@@ -149,39 +152,19 @@ export default {
                 weapon.update(elapsedTime, player);
             }
 
+            // interact with closest entity
             if (closestItemIndex !== null) {
                 const entity = entityList[closestItemIndex];
                 entity.inInteractRange = true;
 
                 if (controls.interact && !controls.previousControls.interact) {
-                    if (entity.type === 'item') {
-                        const itemType = entity.itemType;
+                    const interaction =  interactions.getInteraction('player', entity.type);
 
-                        entityList.splice(closestItemIndex, 1);
-                        if (!player.inventory[itemType]) {
-                            player.inventory[itemType] = entity.count;
-                        } else {
-                            player.inventory[itemType]++;
-                        }
-                    } else if (entity.type === 'fire') {
-                        player.addItemMenu = true;
-                        interactWith = entity;
-                    } else if (entity.type === 'tree') {
-                        if (!player.inventory.wood) {
-                            player.inventory.wood = 10;
-                        } else {
-                            player.inventory.wood += 10;
-                        }
-
-                        entityList[closestItemIndex] = stump.create({
-                            x: entity.x,
-                            y: entity.y,
-                        });
-                    } else if (entity.talkable) {
-                        player.talkingTo = entity;
-                    } else if (entity.type === 'bulletin') {
-                        player.checkBulletin = true;
+                    if (!interaction) {
+                        player.entityInRange = entity;
                     }
+
+                    interaction(player, entity);
                 } else {
                     player.entityInRange = entity;
                 }
@@ -204,78 +187,47 @@ export default {
         player.weapon = swordFactory.create({ speed: 1000 });
 
         player.dropItem = (itemType) => {
-            const itemCount = player.inventory[itemType];
+            const item = player.inventory.removeKey(itemType);
 
-            const droppedItem = item.create({
-                causesCollisions: false,
-                width: GRID_SIZE,
-                height: GRID_SIZE,
-                x: player.x,
-                y: player.y,
-                itemType,
-                count: itemCount,
-            });
-
-            player.inventory[itemType] = 0;
-
-            return droppedItem;
+            if (item) {
+                console.log(item);
+                return itemFactory.dropItem(player.x, player.y, item);
+            }
         };
 
         player.useItem = (itemType) => {
-            const itemCount = player.inventory[itemType];
+            if (player.interactWith) {
+                const interaction = interactions.getInteraction(player.interactWith.type, itemType);
 
-            let loseItems = false;
+                if (interaction) {
+                    interaction(player, player.interactWith, itemType);
+                    return true;
+                }
+            } else {
+                const interaction = interactions.getInteraction('player', itemType);
 
-            switch (itemType) {
-                case 'wood':
-                    if (interactWith.type === 'fire') {
-                        player.health += 10 * itemCount;
-                        loseItems = true;
-                    }
-                    break;
-                case 'corpse':
-                    player.health +=  itemCount;
-                    break;
-                case 'cauldron':
-                    if (interactWith.type === 'fire') {
-                        interactWith.hasCauldron = true;
-                        loseItems = true;
-                    }
-                    break;
-                case 'herb':
-                    if (interactWith.type === 'fire') {
-                        if (interactWith.hasCauldron) {
-                            notify.alert(`You got ${itemCount} potions!`);
-                            player.inventory['potion'] = itemCount;
-                        } else {
-                            player.health += itemCount;
-                        }
-
-                        loseItems = true;
-                    }
-                    break;
-                default:
-                    return false;
+                if (interaction) {
+                    interaction(player, itemType);
+                    return true;
+                }
             }
 
-            if (loseItems) {
-                player.inventory[itemType] = 0;
-            }
-
-            return true;
+            return false;
         };
 
         player.craftItem = (itemType) => {
-            const item = CRAFTABLE_ITEMS.find(item => item.name === itemType);
+            // TODO possibly add multiple crafting options
+            const craftableItem = CRAFTABLE_ITEMS.find(item => item.name === itemType);
 
-            if (!player.inventory[item.name]) {
-                player.inventory[item.name] = 1;
-            } else {
-                player.inventory[item.name]++;
+            for (let itemName in craftableItem.cost) {
+                player.inventory.removeKey(itemName, craftableItem.cost[itemName]);
             }
 
-            for (let itemName in item.cost) {
-                player.inventory[itemName] -= item.cost[itemName];
+            if (!player.inventory.addItem(craftableItem.name)) {
+                itemFactory.dropItem(player.x, player.y, {
+                    key: craftableItem.name,
+                    count: 1,
+                });
             }
         };
 
@@ -295,16 +247,12 @@ export default {
             if (finishQuest) {
                 const rewardText = [];
 
-                player.inventory[finishQuest.goal.item] -= finishQuest.goal.itemCount;
+                player.inventory.removeKey(finishQuest.goal.item, finishQuest.goal.itemCount);
 
                 for (let itemName in finishQuest.reward) {
                     rewardText.push(`  +${finishQuest.reward[itemName]} ${itemName}`);
 
-                    if (!player.inventory[itemName]) {
-                        player.inventory[itemName] = finishQuest.reward[itemName];
-                    } else {
-                        player.inventory[itemName] += finishQuest.reward[itemName];
-                    }
+                    player.inventory.addItem(itemName, finishQuest.reward[itemName]);
                 }
 
                 notify.alert([
