@@ -112,3 +112,40 @@ export const moveEntityTo = (entity, x, y, elapsedTime) => {
         newY: entity.y + yDiff,
     }
 };
+
+// TODO
+export const areLinesIntersecting = (line1, line2) => {
+    let interceptX;
+    let interceptY;
+
+    if (line1.x1 === line1.x2) {
+        if (line2.x1 === line2.x2) {
+
+        }
+
+        if (line2.x1 <= line1.x1 && line1.x1 <= line2.x2) {
+            return;
+        }
+    } else if (line2.x1 === line2.x2) {
+        return;
+    } else {
+        const slope1 = (line1.y1 - line1.y2) / (line1.x1 - line1.x2);
+        const yIntercept1 = line1.y1 - slope1 * line1.x1;
+
+        const slope2 = (line2.y1 - line2.y2) / (line2.x1 - line2.x2);
+        const yIntercept2 = line2.y1 - slope2 * line2.x1;
+
+        interceptX = (yIntercept2 - yIntercept1) / (slope1 - slope2);
+        interceptY = slope1 * interceptX + yIntercept1;
+    }
+
+    if (interceptX >= line1.x1 && interceptX <= line1.x2
+        && interceptX >= line2.x1 && interceptX <= line2.x2
+        && interceptY >= line1.y1 && interceptY <= line1.y2
+        && interceptY >= line2.y1 && interceptY <= line2.y2) {
+
+        return { x: interceptX, y: interceptY };
+    }
+
+    return null;
+};

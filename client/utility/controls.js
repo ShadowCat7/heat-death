@@ -1,3 +1,5 @@
+import { VIEW_HEIGHT, VIEW_WIDTH } from '../constants.js';
+
 const controlMap = {
     'KeyW': 'moveUp',
     'KeyS': 'moveDown',
@@ -60,4 +62,22 @@ export const getControls = (buttonsPressed, mouse) => {
 
 export const freshPress = (controls, key) => {
     return controls[key] && !controls.previousControls[key];
+};
+
+export const nonePressed = (controls, keys) => {
+    const anyPressed = keys.find(key => controls[key]);
+    return !anyPressed;
+};
+
+export const getMouseRelativeToPlayer = (controls, player) => {
+    const roomX = player.x + player.rect.width / 2 - VIEW_WIDTH / 2;
+    const roomY = player.y + player.rect.height / 2 - VIEW_HEIGHT / 2;
+
+    const mouseX = controls.mouseX + roomX;
+    const mouseY = controls.mouseY + roomY;
+
+    return {
+        x: mouseX,
+        y: mouseY,
+    };
 };

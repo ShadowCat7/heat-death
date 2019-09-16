@@ -16,6 +16,7 @@ import swordFactory from './weapons/sword.js';
 import createInventory from '../items/item-storage.js';
 import levels from '../levels/levels.js';
 import interactions from './interactions.js';
+import dash from '../spells/dash.js';
 
 const INVENTORY_SIZE = 18;
 
@@ -36,38 +37,82 @@ export default {
 
         options.direction = 'down';
 
-        let interactWith = null;
+        const spells = [{
+            key: 'leftClick',
+            spell: dash(),
+        }];
+
+        options.velocityX = 0;
+        options.velocityY = 0;
+
+        const setVelocityX = (newValue) => {
+            if (Math.abs(newValue) >= Math.abs(player.velocityX)) {
+                player.velocityX = newValue;
+            }
+        };
+        const setVelocityY = (newValue) => {
+            if (Math.abs(newValue) >= Math.abs(player.velocityY)) {
+                player.velocityY = newValue;
+            }
+        };
 
         options.update = (player, controls, entityList, elapsedTime) => {
             player.entityInRange = null;
             const weapon = player.weapon;
 
-            let newX = player.x;
-            let newY = player.y;
+            let isCasting = false;
+            spells.forEach(spell => {
+                spell.spell.update(elapsedTime, controls, player);
+                controls[spell.key] && spell.spell.activate(player, controls);
 
-            if (controls.moveUp) {
-                newY -= elapsedTime * MAX_SPEED;
-                if (!player.attacking) {
-                    player.direction = 'up';
+                if (spell.spell.isActivated()) {
+                    isCasting = true;
+                }
+            });
+
+            if (!isCasting) {
+                if (controls.moveUp) {
+                    setVelocityY(-MAX_SPEED);
+                    if (!player.attacking) {
+                        player.direction = 'up';
+                    }
+                } else if (controls.moveDown) {
+                    setVelocityY(MAX_SPEED);
+                    if (!player.attacking) {
+                        player.direction = 'down';
+                    }
+                } else {
+                    if (Math.abs(player.velocityY) < MAX_SPEED) {
+                        player.velocityY = 0;
+                    } else {
+                        player.velocityY += player.velocityY > 0 ? -MAX_SPEED : MAX_SPEED;
+                    }
+                }
+
+                if (controls.moveLeft) {
+                    setVelocityX(-MAX_SPEED);
+                    if (!player.attacking) {
+                        player.direction = 'left';
+                    }
+                } else if (controls.moveRight) {
+                    setVelocityX(MAX_SPEED);
+                    if (!player.attacking) {
+                        player.direction = 'right';
+                    }
+                } else {
+                    if (Math.abs(player.velocityX) < MAX_SPEED) {
+                        player.velocityX = 0;
+                    } else {
+                        player.velocityX += player.velocityX > 0 ? -MAX_SPEED : MAX_SPEED;
+                    }
                 }
             }
-            if (controls.moveDown) {
-                newY += elapsedTime * MAX_SPEED;
-                if (!player.attacking) {
-                    player.direction = 'down';
-                }
+
+            if (Math.abs(player.velocityY) > MAX_SPEED) {
+                player.velocityY += player.velocityY > 0 ? -MAX_SPEED : MAX_SPEED;
             }
-            if (controls.moveLeft) {
-                newX -= elapsedTime * MAX_SPEED;
-                if (!player.attacking) {
-                    player.direction = 'left';
-                }
-            }
-            if (controls.moveRight) {
-                newX += elapsedTime * MAX_SPEED;
-                if (!player.attacking) {
-                    player.direction = 'right';
-                }
+            if (Math.abs(player.velocityX) > MAX_SPEED) {
+                player.velocityX += player.velocityX > 0 ? -MAX_SPEED : MAX_SPEED;
             }
 
             if (!player.attacking && controls.attack && !controls.previousControls.attack) {
@@ -75,6 +120,9 @@ export default {
                 // Setting default positioning for player position and direction
                 weapon.update(elapsedTime, player);
             }
+
+            let newX = player.x + player.velocityX * elapsedTime;
+            let newY = player.y + player.velocityY * elapsedTime;
 
             let closestItemIndex = null;
             let closestItemDistance = null;
@@ -190,7 +238,6 @@ export default {
             const item = player.inventory.removeKey(itemType);
 
             if (item) {
-                console.log(item);
                 return itemFactory.dropItem(player.x, player.y, item);
             }
         };

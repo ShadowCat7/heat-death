@@ -21,7 +21,6 @@ const getCraftingMenuItem = (item, inventory) => {
 
     for (let itemName in item.cost) {
         const inventoryItem = inventory.getKey(itemName) || {};
-        console.log(inventoryItem);
 
         const count = inventoryItem.count || 0;
 
