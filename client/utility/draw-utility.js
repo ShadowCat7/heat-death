@@ -44,19 +44,21 @@ export const rotateDrawRect = (ctx, options) => {
 
 const setupTextContext = (ctx, options = {}) => {
     const {
+        fontSize = DEFAULT_FONT_SIZE,
         font = DEFAULT_FONT,
         textColor = DEFAULT_TEXT_COLOR,
         textAlign = DEFAULT_TEXT_ALIGN,
         textBaseline = DEFAULT_TEXT_BASELINE,
     } = options;
 
-    ctx.font = font;
+    ctx.font = `${fontSize} ${font}`;
     ctx.fillStyle = textColor;
     ctx.textAlign = textAlign;
     ctx.textBaseline = textBaseline;
 };
 
-const DEFAULT_FONT = '30px Arial';
+const DEFAULT_FONT = 'Arial';
+const DEFAULT_FONT_SIZE = '30px';
 export const DEFAULT_TEXT_COLOR = '#e0e0e0';
 const DEFAULT_TEXT_ALIGN = 'left';
 const DEFAULT_TEXT_BASELINE = 'top';
@@ -100,7 +102,7 @@ export const drawBorder = (ctx, options = {}) => {
     ctx.fillRect(x + borderWidth, y + borderWidth, width - borderWidth * 2, height - borderWidth * 2);
 };
 
-const getTextWidth = (ctx, text, options) => {
+export const getTextWidth = (ctx, text, options) => {
     const {
         borderWidth = DEFAULT_BORDER_WIDTH,
         leftPadding = DEFAULT_PADDING,
@@ -205,14 +207,14 @@ export const drawInteractText = (ctx, viewX, viewY, action, entity) => {
     const y = entity.y - viewY;
 
     drawText(ctx, action, x + entity.rect.width / 2, y, {
-        font: '22px Arial',
+        fontSize: '22px',
         textAlign: 'center',
         textBaseline: 'bottom',
     });
 };
 
 const SLOT_WIDTH = 55;
-const SLOT_BORDER_WIDTH = 5;
+export const SLOT_BORDER_WIDTH = 5;
 const SLOT_COLOR = '#e0e0e0';
 export const drawSlot = (ctx, {
     x,
@@ -228,19 +230,14 @@ export const drawSlot = (ctx, {
     ctx.stroke();
 };
 
-export const drawSlotWithItem = (ctx, {
-    x,
-    y,
-    itemColor,
-    width = SLOT_WIDTH,
-    borderWidth = SLOT_BORDER_WIDTH,
-    color = SLOT_COLOR,
-}) => {
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = borderWidth;
-    ctx.rect(x + borderWidth / 2, y + borderWidth / 2, width, width);
-    ctx.stroke();
+export const drawItemInSlot = (ctx, options = {}) => {
+    const {
+        x,
+        y,
+        itemColor = 'green',
+        width = SLOT_WIDTH,
+        borderWidth = SLOT_BORDER_WIDTH,
+    } = options;
 
     const diff = borderWidth + (width - borderWidth - GRID_SIZE) / 2;
 

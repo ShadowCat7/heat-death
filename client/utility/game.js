@@ -17,17 +17,17 @@ let controls = {};
 let providedUpdate = null;
 let providedDraw = null;
 
-function draw() {
+function draw(mouse) {
     let ctx = canvas.getContext('2d');
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     fpsLabel.innerHTML = Math.round(engine.fps);
 
-    providedDraw(ctx);
+    providedDraw(ctx, mouse);
 }
 
-function update(buttonsPressed, elapsedTime) {
-    controls = getControls(buttonsPressed);
+function update(buttonsPressed, mouse, elapsedTime) {
+    controls = getControls(buttonsPressed, mouse);
 
     controls.previousControls = previousControls;
 

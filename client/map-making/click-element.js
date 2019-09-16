@@ -56,7 +56,7 @@ const createClickElement = ({
 
         if (hover) {
             drawText(ctx, entity.type, x + entity.rect.width / 2, y + entity.rect.width / 2, {
-                font: '22px Arial',
+                fontSize: '22px',
                 textColor: '#000',
                 textAlign: 'center',
                 textBaseline: 'middle',

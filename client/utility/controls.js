@@ -42,11 +42,22 @@ export const controlsToString = () => {
     return controls;
 };
 
-export const getControls = (buttonsPressed) => {
+export const getControls = (buttonsPressed, mouse) => {
     const controls = {};
     for (let button in buttonsPressed) {
         controls[controlMap[button]] = buttonsPressed[button];
     }
 
+    if (mouse.leftClick) {
+        controls.leftClick = true;
+    }
+
+    controls.mouseX = mouse.x;
+    controls.mouseY = mouse.y;
+
     return controls;
+};
+
+export const freshPress = (controls, key) => {
+    return controls[key] && !controls.previousControls[key];
 };

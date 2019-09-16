@@ -11,6 +11,12 @@ function Engine(canvas, updateFunc, drawFunc) {
     let timeoutId = null;
     const buttonsPressed = {};
     const keysPressedLabel = document.getElementById('keypressed');
+    const mouse = {
+        x: 0,
+        y: 0,
+        leftClick: false,
+        rightClick: false,
+    };
 
     self.fps = TARGET_FPS;
 
@@ -29,7 +35,7 @@ function Engine(canvas, updateFunc, drawFunc) {
                 timeSinceLastUpdate = MAX_SPF;
 
             setTimeout(function () {
-                updateFunc(buttonsPressed, timeSinceLastUpdate);
+                updateFunc(buttonsPressed, mouse, timeSinceLastUpdate);
             }, 0);
 
             animationFrameId = requestAnimationFrame(draw, canvas);
@@ -44,7 +50,7 @@ function Engine(canvas, updateFunc, drawFunc) {
             self.fps = self.fps * FPS_SMOOTHNESS + fps * FPS_ONE_FRAME_WEIGHT;
 
             setTimeout(function () {
-                drawFunc();
+                drawFunc(mouse);
             }, 0);
 
             timeoutId = setTimeout(update, 0);
@@ -78,6 +84,42 @@ function Engine(canvas, updateFunc, drawFunc) {
         e.stopPropagation();
         buttonsPressed[e.code] = false;
     });
+
+    canvas.onmousedown = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        mouse.leftClick = e.button === 0;
+        mouse.rightClick = e.button === 2;
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    };
+
+    canvas.onmouseup = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (e.button === 0) {
+            mouse.leftClick = false;
+        } else if (e.button === 2) {
+            mouse.rightClick = false;
+        }
+
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    };
+
+    document.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    }, false);
+
+    document.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        mouse.x = touch.clientX;
+        mouse.y = touch.clientY;
+    }, false);
 }
 
 export default {

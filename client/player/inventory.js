@@ -15,12 +15,14 @@ const getInventory = (inventory, entityInRange) => {
 
         actions.push('drop');
 
-        inventoryItems.push({
+        const inventoryItem = {
             label: `${item.key}: ${item.count}`,
             id: item.key,
             disabled: item.count === 0,
             actions,
-        });
+        };
+
+        inventoryItems.push(inventoryItem);
     });
 
     return inventoryItems;
@@ -43,7 +45,7 @@ export default {
     update: (showCursor, controls, chooseCallback) => {
         inventoryMenu.update(showCursor, controls, chooseCallback);
     },
-    draw: (ctx) => {
-        inventoryMenu.draw(ctx);
+    draw: (ctx, mouse) => {
+        inventoryMenu.draw(ctx, mouse);
     },
 };

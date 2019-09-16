@@ -19,6 +19,7 @@ import bulletin from './entity/bulletin.js';
 import person, { CARPENTER } from './entity/people/person.js';
 import { LEVEL_WIDTH } from './constants.js';
 import events, { EVENTS } from './utility/events.js';
+import { SWAP } from './utility/slot-menu.js';
 
 let sprites = null;
 
@@ -49,13 +50,13 @@ const drawGame = (ctx) => {
     hud.draw(ctx, player);
 };
 
-function draw(ctx) {
+function draw(ctx, mouse) {
     drawGame(ctx);
 
     if (currentEvent === EVENTS.BULLETIN) {
         bulletinMenu.draw(ctx);
     } else if (currentEvent === EVENTS.INVENTORY || currentEvent === EVENTS.INTERACT) {
-        inventoryMenu.draw(ctx);
+        inventoryMenu.draw(ctx, mouse);
     } else if (currentEvent === EVENTS.CRAFTING) {
         craftingMenu.draw(ctx);
     } else if (currentControls.map) {
@@ -127,11 +128,22 @@ function update(controls, elapsedTime) {
             events.acknowledge();
         }
 
-        inventoryMenu.update(true, controls, (itemType, action) => {
+        inventoryMenu.update(true, controls, (payload) => {
             player.addItemMenu = false;
 
-            if (!itemType || !action) {
+            if (payload === null) {
                 events.drop();
+                return;
+            }
+
+            const {
+                itemType,
+                action,
+            } = payload;
+
+            if (action === SWAP) {
+                player.inventory.swapItems(payload.index1, payload.index2);
+                inventoryMenu.updateMenuItems(player.inventory);
             } else if (action === 'drop') {
                 player.dropItem(itemType, action);
 

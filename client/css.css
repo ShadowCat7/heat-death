@@ -12,6 +12,7 @@ body {
 
 canvas {
     background-color: black;
+    //cursor: none;
 }
 
 #sprite {

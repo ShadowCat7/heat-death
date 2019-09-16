@@ -91,7 +91,7 @@ function draw(ctx) {
         const y = Math.floor((mouseY + cameraY) / GRID_SIZE) * GRID_SIZE;
 
         drawText(ctx, `${x}, ${y}`, 5, VIEW_HEIGHT, {
-            font: '12px Arial',
+            fontSize: '12px',
             textColor: '#000',
             textAlign: 'left',
             textBaseline: 'bottom',

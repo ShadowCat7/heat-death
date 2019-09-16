@@ -17,7 +17,7 @@ import createInventory from '../items/item-storage.js';
 import levels from '../levels/levels.js';
 import interactions from './interactions.js';
 
-const INVENTORY_SIZE = 30;
+const INVENTORY_SIZE = 18;
 
 const MAX_SPEED = 300;
 

@@ -81,8 +81,12 @@ export default (size) => {
             list[index1] = item2;
             list[index2] = item1;
 
-            item1.index = index2;
-            item2.index = index1;
+            if (item1) {
+                map[item1].index = index2;
+            }
+            if (item2) {
+                map[item2].index = index1;
+            }
         },
         forEach: (func) => {
             for (let i = 0; i < list.length; i++) {

@@ -12,7 +12,7 @@ export default {
         ctx.fillRect(3, 3, player.health / 1000 * (VIEW_WIDTH - 6), 15);
 
         drawText(ctx, `${player.health}/1000`, VIEW_WIDTH / 2, 6, {
-            font: '12px Arial',
+            fontSize: '12px',
             textAlign: 'center',
         });
 
