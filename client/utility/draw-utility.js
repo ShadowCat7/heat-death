@@ -213,7 +213,7 @@ export const drawInteractText = (ctx, viewX, viewY, action, entity) => {
     });
 };
 
-const SLOT_WIDTH = 55;
+export const SLOT_WIDTH = 55;
 export const SLOT_BORDER_WIDTH = 5;
 const SLOT_COLOR = '#e0e0e0';
 export const drawSlot = (ctx, {

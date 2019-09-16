@@ -119,6 +119,8 @@ export default({
             elements.forEach((element, index) => {
                 const state = element.update(controls);
 
+                if (!items[index].id) return;
+
                 if (state === CLICKED) {
                     const item = items[index];
 

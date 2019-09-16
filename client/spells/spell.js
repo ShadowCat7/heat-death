@@ -12,7 +12,6 @@ export default (options) => {
         activate: () => {
             if (!isOnCooldown) {
                 isOnCooldown = true;
-                timer.reset();
                 return true;
             }
 
@@ -21,7 +20,9 @@ export default (options) => {
         update: (elapsedTime) => {
             if (isOnCooldown && timer.update(elapsedTime)) {
                 isOnCooldown = false;
+                timer.reset();
             }
         },
+        getCooldownComplete: () => Math.min(timer.getTime() / cooldown, 1),
     };
 };

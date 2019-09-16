@@ -6,8 +6,8 @@ import timerFactory from '../utility/timer.js';
 const COOLDOWN = 3;
 const NAME = 'Dash';
 
-const DASH_SPEED = 1100;
-const DASH_DURATION = 0.25;
+const DASH_SPEED = 1200;
+const DASH_DURATION = 0.20;
 
 export default () => {
     const spell = spellFactory({
@@ -22,6 +22,7 @@ export default () => {
     return {
         isActivated: () => isActivated,
         getName: () => NAME,
+        getCooldownComplete: spell.getCooldownComplete,
         update: (elapsedTime, controls, player) => {
             spell.update(elapsedTime);
 

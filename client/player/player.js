@@ -37,9 +37,12 @@ export default {
 
         options.direction = 'down';
 
-        const spells = [{
+        options.spells = [{
             key: 'leftClick',
             spell: dash(),
+        }, {
+            key: 'rightClick',
+            spell: null,
         }];
 
         options.velocityX = 0;
@@ -61,7 +64,10 @@ export default {
             const weapon = player.weapon;
 
             let isCasting = false;
-            spells.forEach(spell => {
+
+            player.spells.forEach(spell => {
+                if (!spell.spell) return;
+
                 spell.spell.update(elapsedTime, controls, player);
                 controls[spell.key] && spell.spell.activate(player, controls);
 
